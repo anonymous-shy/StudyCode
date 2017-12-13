@@ -6,7 +6,12 @@
 
     <groupId>xyz.shy</groupId>
     <artifactId>StudyCode</artifactId>
+    <packaging>pom</packaging>
     <version>1.0</version>
+    <modules>
+        <module>Spark163</module>
+        <module>KafkaStudy</module>
+    </modules>
 
 
 </project>

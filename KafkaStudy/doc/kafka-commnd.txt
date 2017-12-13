@@ -1,0 +1,21 @@
+kafka-topics --create --zookeeper tagtic-master:2181 --replication-factor 3 --partitions 3 --topic test-topic
+kafka-topics --describe --zookeeper tagtic-master:2181 --topic test-topic
+kafka-console-producer --broker-list tagtic-slave01:9092 --topic test-topic
+kafka-console-consumer --zookeeper tagtic-master:2181 --topic test-topic --from-beginning
+connect-standalone.sh config/connect-standalone.properties config/connect-file-source.properties config/connect-file-sink.properties
+
+
+kafka-topics --create \
+	--zookeeper localhost:2181 \
+	--replication-factor 1 \
+	--partitions 1 \
+	--topic streams-file-input
+
+kafka-console-consumer --zookeeper tagtic-master:2181 \
+	--topic test-topic \
+	--from-beginning \
+	--formatter kafka.tools.DefaultMessageFormatter \
+	--property print.key=true \
+	--property print.value=true \
+	--property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer \
+	--property value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
