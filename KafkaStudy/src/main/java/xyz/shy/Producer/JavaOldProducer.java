@@ -1,4 +1,4 @@
-package shy.Producer;
+package xyz.shy.Producer;
 
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;

@@ -1,4 +1,4 @@
-package shy.Producer;
+package xyz.shy.Producer;
 
 import kafka.producer.Partitioner;
 import kafka.utils.VerifiableProperties;

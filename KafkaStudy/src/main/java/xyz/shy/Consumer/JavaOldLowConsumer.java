@@ -1,4 +1,4 @@
-package shy.Consumer;
+package xyz.shy.Consumer;
 
 import kafka.api.FetchRequest;
 import kafka.api.FetchRequestBuilder;

@@ -1,4 +1,4 @@
-package shy.Producer;
+package xyz.shy.Producer;
 
 import org.apache.kafka.clients.producer.*;
 import org.slf4j.Logger;

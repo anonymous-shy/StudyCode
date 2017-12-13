@@ -1,4 +1,4 @@
-package spark163.streaming
+package xyz.shy.spark163.streaming
 
 import kafka.serializer.StringDecoder
 import org.apache.spark.SparkConf

@@ -1,4 +1,4 @@
-package shy.zookeeper;
+package xyz.shy.zookeeper;
 // import java classes
 
 import org.apache.zookeeper.KeeperException;

@@ -1,4 +1,4 @@
-package spark163.streaming
+package xyz.shy.spark163.streaming
 
 import org.apache.spark.streaming.kafka.KafkaUtils
 import org.apache.spark.streaming.{Duration, Seconds, StreamingContext}

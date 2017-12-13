@@ -1,4 +1,4 @@
-package shy.Consumer;
+package xyz.shy.Consumer;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;

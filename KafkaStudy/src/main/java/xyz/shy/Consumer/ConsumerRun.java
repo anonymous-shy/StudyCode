@@ -1,4 +1,4 @@
-package shy.Consumer;
+package xyz.shy.Consumer;
 
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
