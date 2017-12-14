@@ -1,16 +1,16 @@
 package xyz.shy.spark163.streaming
 
-import kafka.api.{TopicMetadataRequest, PartitionOffsetRequestInfo, OffsetRequest}
+import kafka.api.{OffsetRequest, PartitionOffsetRequestInfo, TopicMetadataRequest}
+import kafka.common.TopicAndPartition
 import kafka.consumer.SimpleConsumer
 import kafka.message.MessageAndMetadata
 import kafka.serializer.StringDecoder
-import kafka.utils.{ZkUtils, ZKGroupTopicDirs}
+import kafka.utils.{ZKGroupTopicDirs, ZkUtils}
 import org.I0Itec.zkclient.ZkClient
+import org.apache.spark.SparkConf
 import org.apache.spark.streaming.dstream.InputDStream
-import org.apache.spark.{rdd, SparkConf}
-import org.apache.spark.streaming.kafka.{OffsetRange, HasOffsetRanges, KafkaUtils}
+import org.apache.spark.streaming.kafka.{HasOffsetRanges, KafkaUtils, OffsetRange}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
-import kafka.common.TopicAndPartition
 
 /**
   * Created by Shy on 2017/12/14
@@ -59,14 +59,14 @@ object KafkaDirectZK1 {
       }
       //--get partition leader  end----
       for (i <- 0 until children) {
-        val partitionOffset = zkClient.readData[String](s"${topicDirs.consumerOffsetDir}/${i}")
+        val partitionOffset = zkClient.readData[String](s"${topicDirs.consumerOffsetDir}/$i")
         val tp = TopicAndPartition(topics, i)
         //---additional begin-----
         val requestMin = OffsetRequest(Map(tp -> PartitionOffsetRequestInfo(OffsetRequest.EarliestTime, 1))) // -2,1
         val consumerMin = new SimpleConsumer(partitions(i), 8092, 10000, 10000, "getMinOffset")
         val curOffsets = consumerMin.getOffsetsBefore(requestMin).partitionErrorAndOffsets(tp).offsets
         var nextOffset = partitionOffset.toLong
-        if (curOffsets.length > 0 && nextOffset < curOffsets.head) { //如果下一个offset小于当前的offset
+        if (curOffsets.nonEmpty && nextOffset < curOffsets.head) { //如果下一个offset小于当前的offset
           nextOffset = curOffsets.head
         }
         //---additional end-----
