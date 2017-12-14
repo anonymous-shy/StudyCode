@@ -58,6 +58,5 @@ object KafkaDirect {
     dStream.print()
     ssc.start()
     ssc.awaitTermination()
-    ssc.stop()
   }
 }
