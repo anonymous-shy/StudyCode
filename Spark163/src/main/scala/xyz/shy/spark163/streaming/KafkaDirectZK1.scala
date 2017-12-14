@@ -14,6 +14,7 @@ import kafka.common.TopicAndPartition
 
 /**
   * Created by Shy on 2017/12/14
+  * https://aseigneurin.github.io/2016/05/07/spark-kafka-achieving-zero-data-loss.html
   */
 
 object KafkaDirectZK1 {
