@@ -100,6 +100,14 @@ object KafkaDirectDB {
                 group: String
               )(): StreamingContext = {
 
+    /**
+      * spark.task.maxFailures=1, Task重试次数为1，即不重试
+      * spark.speculation=false 关闭推测执行,
+      * 重点说下这个参数spark.speculation这个参数表示空闲的资源节点会不会尝试执行还在运行，并且运行时间过长的Task，
+      * 避免单个节点运行速度过慢导致整个任务卡在一个节点上。这个参数最好设置为true。
+      * 与之相配合可以一起设置的参数有spark.speculation.×开头的参数
+      * (设置spark.speculation=true将执行事件过长的节点去掉并重新分配任务而spark.speculation.interval用来设置执行间隔)
+      */
     val conf = new SparkConf()
       .setMaster("mesos://10.142.113.239:5050")
       .setAppName("offset")
