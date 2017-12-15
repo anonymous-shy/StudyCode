@@ -11,6 +11,9 @@
     <modules>
         <module>Spark163</module>
         <module>KafkaStudy</module>
+        <module>ESStudy</module>
+        <module>Common</module>
+        <module>ChineseSegment</module>
     </modules>
 
 

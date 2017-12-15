@@ -20,6 +20,14 @@ import scala.collection.JavaConverters._
 
 /**
   * Created by Shy on 2017/12/14
++----------+--------------+------+-----+---------+-------+
+| Field    | Type         | Null | Key | Default | Extra |
++----------+--------------+------+-----+---------+-------+
+| topic    | varchar(100) | NO   | PRI | NULL    |       |
+| group_id | varchar(50)  | NO   | PRI |         |       |
+| part     | int(4)       | NO   | PRI | 0       |       |
+| offset   | mediumtext   | YES  |     | NULL    |       |
++----------+--------------+------+-----+---------+-------+
   */
 object SetupJdbc {
   def apply(driver: String, host: String, user: String, password: String): Unit = {
