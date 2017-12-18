@@ -26,13 +26,12 @@ public class JavaOldProducer {
         ProducerConfig config = new ProducerConfig(props);
 
         Producer<String, String> producer = new Producer<>(config);
-
         for (long nEvents = 0; nEvents < 100; nEvents++) {
-            String ip = "192.168.2." + rnd.nextInt(255);
-            String msg = LocalDateTime.now().toString() + ",www.shy.xyz," + ip;
-            KeyedMessage<String, String> data = new KeyedMessage<>("test-topic", ip, msg);
+            String ip = "192.168.1." + rnd.nextInt(255);
+            String msg = LocalDateTime.now().toString() + "," + ip;
+            KeyedMessage<String, String> data = new KeyedMessage<>("test-topic", Long.toString(nEvents), msg);
             producer.send(data);
-            TimeUnit.SECONDS.sleep(5);
+            TimeUnit.SECONDS.sleep(1);
         }
         producer.close();
     }

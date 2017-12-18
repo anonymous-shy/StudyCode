@@ -64,7 +64,7 @@ object KafkaDirectDB {
       * 则对比kafka中该topic有效的offset的最小值和数据库保存的offset,去比较大作为新的offset.
       */
     if (taskOffsetInfo.nonEmpty) {
-      val kc = new MyKafkaCluster(kafkaParams)
+      val kc = new KafkaClusterHelper(kafkaParams)
       val earliestLeaderOffsets = kc.getEarliestLeaderOffsets(taskOffsetInfo.keySet)
       if (earliestLeaderOffsets.isLeft)
         throw new SparkException("get kafka partition failed:")

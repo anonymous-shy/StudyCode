@@ -1,8 +1,9 @@
 package xyz.shy.spark163.streaming
 
+import com.typesafe.config.ConfigFactory
 import kafka.serializer.StringDecoder
 import org.apache.spark.SparkConf
-import org.apache.spark.streaming.kafka.KafkaUtils
+import org.apache.spark.streaming.kafka.{HasOffsetRanges, KafkaUtils, OffsetRange}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
 /**
@@ -11,6 +12,7 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 object KafkaDirect {
 
   def main(args: Array[String]): Unit = {
+    val rconf = ConfigFactory.load()
     val conf = new SparkConf()
       .setAppName(getClass.getSimpleName)
       .setMaster("local[*]")
@@ -50,11 +52,21 @@ object KafkaDirect {
       * VD type of Kafka message value decoder
       * DStream of (Kafka message key, Kafka message value)
       */
+
     val dStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
       ssc,
-      Map("bootstrap.servers" -> "192.168.1.101:9092,192.168.1.102:9092,192.168.1.103:9092"),
-      Set("topic1")
+      Map("bootstrap.servers" -> rconf.getString("com-kafka.brokers")),
+      Set(rconf.getString("com-kafka.topics"))
     )
+    var offsetRanges = Array[OffsetRange]()
+    dStream.transform { rdd =>
+      offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
+      rdd
+    }.foreachRDD { rdd =>
+      for (o <- offsetRanges) {
+        println(s"${o.topic} ${o.partition} ${o.fromOffset} ${o.untilOffset}")
+      }
+    }
     dStream.print()
     ssc.start()
     ssc.awaitTermination()
