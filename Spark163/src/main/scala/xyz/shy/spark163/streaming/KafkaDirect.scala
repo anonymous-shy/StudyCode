@@ -62,11 +62,14 @@ object KafkaDirect {
     dStream.transform { rdd =>
       offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
       rdd
+    }.map { rdd =>
+      println(rdd._1)
     }.foreachRDD { rdd =>
-      for (o <- offsetRanges) {
-        println(s"${o.topic} ${o.partition} ${o.fromOffset} ${o.untilOffset}")
+        for (o <- offsetRanges) {
+          println(s"${o.topic} ${o.partition} ${o.fromOffset} ${o.untilOffset}")
+        }
+        println("===========================================")
       }
-    }
     dStream.print()
     ssc.start()
     ssc.awaitTermination()
