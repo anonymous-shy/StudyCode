@@ -20,16 +20,17 @@ public class JavaOldProducer {
         Properties props = new Properties();
         props.put("metadata.broker.list", "192.168.71.62:9092,192.168.71.63:9092,192.168.71.64:9092");
         props.put("serializer.class", "kafka.serializer.StringEncoder");
-        props.put("partitioner.class", "xyz.shy.Producer.SimplePartitioner");
+//        props.put("partitioner.class", "xyz.shy.Producer.SimplePartitioner");
         props.put("request.required.acks", "1");
 
         ProducerConfig config = new ProducerConfig(props);
 
         Producer<String, String> producer = new Producer<>(config);
-        for (long nEvents = 0; nEvents < 100; nEvents++) {
+        for (long nEvents = 1; nEvents <= 3600; nEvents++) {
             String ip = "192.168.1." + rnd.nextInt(255);
-            String msg = LocalDateTime.now().toString() + "," + ip;
-            KeyedMessage<String, String> data = new KeyedMessage<>("test-topic", Long.toString(nEvents), msg);
+            String msg = LocalDateTime.now().toString() + "::" + ip;
+            System.out.println(nEvents + " - " + msg);
+            KeyedMessage<String, String> data = new KeyedMessage<>("topic1", Long.toString(nEvents), msg);
             producer.send(data);
             TimeUnit.SECONDS.sleep(1);
         }

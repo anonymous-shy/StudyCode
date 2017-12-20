@@ -56,21 +56,29 @@ object KafkaDirect {
     val dStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
       ssc,
       Map("bootstrap.servers" -> rconf.getString("com-kafka.brokers")),
-      Set(rconf.getString("com-kafka.topics"))
+      Set(rconf.getString("KafkaTopics"))
     )
     var offsetRanges = Array[OffsetRange]()
     dStream.transform { rdd =>
       offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
       rdd
-    }.map { rdd =>
-      println(rdd._1)
-    }.foreachRDD { rdd =>
+    }
+      //    .mapPartitions { iter =>
+      //      iter.foreach { kt =>
+      //        println(s"key: ${kt._1}, msg: ${kt._2}")
+      //      }
+      //      iter
+      //    }
+      .map { kt =>
+      println(s"key: ${kt._1}, msg: ${kt._2}")
+    }
+      .foreachRDD { rdd =>
         for (o <- offsetRanges) {
           println(s"${o.topic} ${o.partition} ${o.fromOffset} ${o.untilOffset}")
         }
-        println("===========================================")
+        println("-------------------------------------------")
       }
-    dStream.print()
+    //    dStream.print()
     ssc.start()
     ssc.awaitTermination()
   }
