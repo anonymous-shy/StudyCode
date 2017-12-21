@@ -3,19 +3,19 @@ package xyz.shy.spark163.streaming
 import kafka.message.MessageAndMetadata
 import kafka.serializer.StringDecoder
 import kafka.common.TopicAndPartition
-
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.TopicPartition
-import org.apache.spark.{SparkContext, SparkConf, TaskContext, SparkException}
+import org.apache.spark.{SparkConf, SparkContext, SparkException, TaskContext}
 import org.apache.spark.SparkContext._
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.Seconds
 import org.apache.spark.streaming.dstream._
-import org.apache.spark.streaming.kafka.{KafkaUtils, HasOffsetRanges, OffsetRange, KafkaCluster}
-
+import org.apache.spark.streaming.kafka.{HasOffsetRanges, KafkaCluster, KafkaUtils, OffsetRange}
 import com.typesafe.config.ConfigFactory
 import scalikejdbc._
+import xyz.shy.spark163.utils.KafkaClusterHelper
+
 import scala.collection.JavaConverters._
 
 /**

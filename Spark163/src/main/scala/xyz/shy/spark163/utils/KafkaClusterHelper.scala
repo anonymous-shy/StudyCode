@@ -1,4 +1,4 @@
-package xyz.shy.spark163.streaming
+package xyz.shy.spark163.utils
 
 /**
   * copy from spark-kafka source

@@ -31,7 +31,9 @@ object SimpleDirect {
       "zookeeper.connect" -> zkQuorums,
       "auto.offset.reset" -> kafka.api.OffsetRequest.SmallestTimeString
     )
-    val sparkConf = new SparkConf().setAppName(getClass.getSimpleName).setMaster("local[*]")
+    val sparkConf = new SparkConf()
+      .setAppName(getClass.getSimpleName)
+      .setMaster("local[*]")
     val ssc = new StreamingContext(sparkConf, Seconds(5))
     //创建一个 ZKGroupTopicDirs 对象，对保存
     val topicDirs = new ZKGroupTopicDirs(group, topic)
@@ -68,15 +70,17 @@ object SimpleDirect {
       for (o <- offsetRanges) {
         val zkPath = s"${topicDirs.consumerOffsetDir}/${o.partition}"
         ZkUtils.updatePersistentPath(zkClient, zkPath, o.fromOffset.toString) //将该 partition 的 offset 保存到 zookeeper
-        println(s"@@@@@@ topic -> ${o.topic}  partition -> ${o.partition}  fromoffset -> ${o.fromOffset}  untiloffset -> ${o.untilOffset} @@@@@@")
+        println(s"@@@@@@ topic -> ${o.topic} || partition -> ${o.partition} || fromoffset -> ${o.fromOffset} || untiloffset -> ${o.untilOffset} @@@@@@")
       }
       rdd.foreachPartition(
         message => {
           while (message.hasNext) {
-            println(s"@^_^@   [" + message.next() + "] @^_^@")
+            println(s"@^_^@ [" + message.next() + "] @^_^@")
           }
         }
       )
     }
+    ssc.start()
+    ssc.awaitTermination()
   }
 }

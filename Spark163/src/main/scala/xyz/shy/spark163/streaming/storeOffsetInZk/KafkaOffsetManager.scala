@@ -1,4 +1,4 @@
-package xyz.shy.spark163.streaming
+package xyz.shy.spark163.streaming.storeOffsetInZk
 
 import kafka.common.TopicAndPartition
 import kafka.utils.ZkUtils
@@ -13,7 +13,6 @@ import org.apache.spark.streaming.kafka.HasOffsetRanges
   * Created by QinDongLiang on 2017/11/28.
   */
 object KafkaOffsetManager {
-
 
   lazy val log = org.apache.log4j.LogManager.getLogger("KafkaOffsetManage")
 
@@ -36,7 +35,6 @@ object KafkaOffsetManager {
           .map(s => s.split(":")) //按冒号拆分每个分区和偏移量
           .map { case Array(partitionStr, offsetStr) => (TopicAndPartition(topic, partitionStr.toInt) -> offsetStr.toLong) } //加工成最终的格式
           .toMap //返回一个Map
-
         //说明有分区扩展了
         if (offsets.size < lastest_partitions.size) {
           //得到旧的所有分区序号
@@ -49,20 +47,15 @@ object KafkaOffsetManager {
               offsets += (TopicAndPartition(topic, partitionId) -> 0)
               log.warn("新增分区id：" + partitionId + "添加完毕....")
             })
-
           }
-
         } else {
           log.warn("没有发现新增的kafka分区：" + lastest_partitions.mkString(","))
         }
-
-
         Some(offsets) //将Map返回
       case None =>
         None //如果是null，就返回None
     }
   }
-
 
   /** **
     * 保存每个批次的rdd的offset到zk中
@@ -76,17 +69,13 @@ object KafkaOffsetManager {
     val offsetsRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
     //转换每个OffsetRange为存储到zk时的字符串格式 :  分区序号1:偏移量1,分区序号2:偏移量2,......
     val offsetsRangesStr = offsetsRanges.map(offsetRange => s"${offsetRange.partition}:${offsetRange.untilOffset}").mkString(",")
-    log.debug(" 保存的偏移量：  " + offsetsRangesStr)
+    log.debug(" 保存的偏移量:  " + offsetsRangesStr)
     //将最终的字符串结果保存到zk里面
     ZkUtils.updatePersistentPath(zkClient, zkOffsetPath, offsetsRangesStr)
   }
 
-
   class Stopwatch {
     private val start = System.currentTimeMillis()
-
     def get(): Long = (System.currentTimeMillis() - start)
   }
-
-
 }

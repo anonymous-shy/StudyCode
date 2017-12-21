@@ -1,4 +1,4 @@
-package xyz.shy.spark163.streaming
+package xyz.shy.spark163.utils
 
 import kafka.common.TopicAndPartition
 import org.apache.curator.framework.CuratorFrameworkFactory

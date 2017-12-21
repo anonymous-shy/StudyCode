@@ -1,4 +1,4 @@
-package xyz.shy.spark163.streaming
+package xyz.shy.spark163.streaming.storeOffsetInZk
 
 import com.typesafe.config.ConfigFactory
 import kafka.api.{OffsetRequest, PartitionOffsetRequestInfo, TopicMetadataRequest}

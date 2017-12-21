@@ -2,7 +2,13 @@ kafka-topics --create --zookeeper tagtic-master:2181 --replication-factor 2 --pa
 kafka-topics --describe --zookeeper tagtic-master:2181 --topic topic1
 kafka-console-producer --broker-list tagtic-slave01:9092 --topic topic1
 kafka-console-consumer --zookeeper tagtic-master:2181 --topic topic1 --from-beginning
-connect-standalone.sh config/connect-standalone.properties config/connect-file-source.properties config/connect-file-sink.properties
+
+kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list tagtic-slave01:9092 --topic topic1 --time -1
+-1表示查询test各个分区当前最大的消息位移值(注意，这里的位移不只是consumer端的位移，而是指消息在每个分区的位置)
+kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list tagtic-slave01:9092 --topic topic1 --time -2
+-2表示去获取当前各个分区的最小位移。之后把运行第一条命令的结果与刚刚获取的位移之和相减就是集群中该topic的当前消息总数。
+
+查看topic消费进度 kafka-run-class kafka.tools.ConsumerOffsetChecker --zookeeper tagtic-master:2181 --group group-shy --topic topic1
 
 kafka-topics --create \
 	--zookeeper localhost:2181 \
