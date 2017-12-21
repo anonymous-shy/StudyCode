@@ -12,7 +12,7 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 object KafkaDirect {
 
   def main(args: Array[String]): Unit = {
-    val rconf = ConfigFactory.load()
+    val resConf = ConfigFactory.load()
     val conf = new SparkConf()
       .setAppName(getClass.getSimpleName)
       .setMaster("local[*]")
@@ -55,8 +55,8 @@ object KafkaDirect {
 
     val dStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
       ssc,
-      Map("bootstrap.servers" -> rconf.getString("com-kafka.brokers")),
-      Set(rconf.getString("KafkaTopics"))
+      Map("bootstrap.servers" -> resConf.getString("com-kafka.brokers")),
+      Set(resConf.getString("KafkaTopics"))
     )
     var offsetRanges = Array[OffsetRange]()
     dStream.transform { rdd =>

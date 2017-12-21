@@ -1,5 +1,6 @@
 package xyz.shy.spark163.streaming
 
+import com.typesafe.config.ConfigFactory
 import kafka.api.{OffsetRequest, PartitionOffsetRequestInfo, TopicMetadataRequest}
 import kafka.common.TopicAndPartition
 import kafka.consumer.SimpleConsumer
@@ -17,30 +18,47 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
   * https://aseigneurin.github.io/2016/05/07/spark-kafka-achieving-zero-data-loss.html
   */
 
-object KafkaDirectZK1 {
+object KafkaDirectStoreZK {
   def createContext(checkpointDirectory: String) = {
-
-    println("create spark")
-    val topics = "test_tpoics"
-    val group = "test-kafka"
-    val zkQuorum = "10.16.10.191:2181"
-    val brokerList = "10.10.10.196:8092,10.10.10.196:8092"
+    val resConf = ConfigFactory.load()
+    println("----->Create SparkContext<-----")
+    val topics = resConf.getString("KafkaTopics")
+    val group = resConf.getString("KafkaGroup")
+    val zkQuorums = resConf.getString("com.ZKNodes")
+    val brokerList = resConf.getString("com.KafkaBrokers")
     //    val Array(topics, group, zkQuorum,brokerList) = args
-    val sparkConf = new SparkConf().setAppName("Test-SparkDemo-kafka").setMaster("local[3]")
-    sparkConf.set("spark.streaming.kafka.maxRatePerPartition", "1")
-    val ssc = new StreamingContext(sparkConf, Seconds(2))
+    val sparkConf = new SparkConf().setAppName(getClass.getSimpleName).setMaster("local[*]")
+    //    sparkConf.set("spark.streaming.kafka.maxRatePerPartition", "1")
+    val ssc = new StreamingContext(sparkConf, Seconds(5))
     //    ssc.checkpoint(checkpointDirectory)
     val topicsSet = topics.split(",").toSet
     val kafkaParams = Map[String, String](
       "metadata.broker.list" -> brokerList,
       "group.id" -> group,
-      "zookeeper.connect" -> zkQuorum,
+      "zookeeper.connect" -> zkQuorums,
       "auto.offset.reset" -> kafka.api.OffsetRequest.SmallestTimeString
     )
-    val topicDirs = new ZKGroupTopicDirs("test_spark_streaming_group", topics)
+    /**
+      * kafka.utils.ZkUtils
+        val ConsumersPath = "/consumers"
+        val BrokerIdsPath = "/brokers/ids"
+        val BrokerTopicsPath = "/brokers/topics"
+        val TopicConfigPath = "/config/topics"
+        val TopicConfigChangesPath = "/config/changes"
+        val ControllerPath = "/controller"
+        val ControllerEpochPath = "/controller_epoch"
+        val ReassignPartitionsPath = "/admin/reassign_partitions"
+        val DeleteTopicsPath = "/admin/delete_topics"
+        val PreferredReplicaLeaderElectionPath = "/admin/preferred_replica_election"
+
+        class ZKGroupTopicDirs(group: String, topic: String) extends ZKGroupDirs(group) {
+          def consumerOffsetDir = consumerGroupDir + "/offsets/" + topic
+          def consumerOwnerDir = consumerGroupDir + "/owners/" + topic
+        }
+      */
+    val topicDirs = new ZKGroupTopicDirs(group, topics)
     val zkTopicPath = s"${topicDirs.consumerOffsetDir}"
-    val hostAndPort = "10.16.10.191:2181"
-    val zkClient = new ZkClient(hostAndPort)
+    val zkClient = new ZkClient(zkQuorums)
     val children = zkClient.countChildren(zkTopicPath)
     var kafkaStream: InputDStream[(String, String)] = null
     var fromOffsets: Map[TopicAndPartition, Long] = Map()
@@ -48,7 +66,7 @@ object KafkaDirectZK1 {
       //---get partition leader begin----
       val topicList = List(topics)
       val req = new TopicMetadataRequest(topicList, 0) //得到该topic的一些信息，比如broker,partition分布情况
-      val getLeaderConsumer = new SimpleConsumer("10.16.10.196", 8092, 10000, 10000, "OffsetLookup") // low level api interface
+      val getLeaderConsumer = new SimpleConsumer("tagtic-master", 8092, 10000, 10000, "OffsetLookup") // low level api interface
       val res = getLeaderConsumer.send(req) //TopicMetadataRequest   topic broker partition 的一些信息
       val topicMetaOption = res.topicsMetadata.headOption
       val partitions = topicMetaOption match {
