@@ -15,7 +15,7 @@ import org.apache.spark.streaming.kafka.{HasOffsetRanges, KafkaUtils, OffsetRang
   * Created by Shy on 2017/12/20
   */
 
-object SimpleDirect {
+object SimpleDirect2Zk {
 
   def main(args: Array[String]): Unit = {
     val resConf = ConfigFactory.load()
@@ -36,19 +36,38 @@ object SimpleDirect {
       .setMaster("local[*]")
     val ssc = new StreamingContext(sparkConf, Seconds(5))
     //创建一个 ZKGroupTopicDirs 对象，对保存
+    /**
+      * kafka.utils.ZkUtils
+      * val ConsumersPath = "/consumers"
+      * val BrokerIdsPath = "/brokers/ids"
+      * val BrokerTopicsPath = "/brokers/topics"
+      * val TopicConfigPath = "/config/topics"
+      * val TopicConfigChangesPath = "/config/changes"
+      * val ControllerPath = "/controller"
+      * val ControllerEpochPath = "/controller_epoch"
+      * val ReassignPartitionsPath = "/admin/reassign_partitions"
+      * val DeleteTopicsPath = "/admin/delete_topics"
+      * val PreferredReplicaLeaderElectionPath = "/admin/preferred_replica_election"
+      * *
+      * class ZKGroupTopicDirs(group: String, topic: String) extends ZKGroupDirs(group) {
+      * def consumerOffsetDir = consumerGroupDir + "/offsets/" + topic <=> /consumers/group-shy/offsets/topic1
+      * def consumerOwnerDir = consumerGroupDir + "/owners/" + topic
+      * }
+      */
     val topicDirs = new ZKGroupTopicDirs(group, topic)
-    //获取 zookeeper 中的路径，这里会变成 /consumers/$group/offsets/topic_name
+    //获取 zookeeper 中的路径，这里会变成 /consumers/$group/offsets/$topic  <=> /consumers/group-shy/offsets/topic1
     val zkTopicPath = s"${topicDirs.consumerOffsetDir}"
     //zookeeper 的host 和 ip，创建一个 client
     val zkClient = new ZkClient(zkQuorums)
-    //查询该路径下是否字节点（默认有字节点为我们自己保存不同 partition 时生成的）
-    val children = zkClient.countChildren(s"${topicDirs.consumerOffsetDir}")
+    //查询该路径下是否字节点【partition个数】（默认有字节点为我们自己保存不同 partition 时生成的）
+    val children = zkClient.countChildren(zkTopicPath)
     var kafkaStream: InputDStream[(String, String)] = null
     //如果 zookeeper 中有保存 offset，我们会利用这个 offset 作为 kafkaStream 的起始位置
     var fromOffsets: Map[TopicAndPartition, Long] = Map()
     if (children > 0) {
       for (i <- 0 until children) {
-        val partitionOffset = zkClient.readData[String](s"${topicDirs.consumerOffsetDir}/${i}")
+        //获取topic下每个partition的offset
+        val partitionOffset = zkClient.readData[String](s"$zkTopicPath/$i")
         val tp = TopicAndPartition(topic, i)
         fromOffsets += (tp -> partitionOffset.toLong)
         println("@@@@@@ topic[" + topic + "] partition[" + i + "] offset[" + partitionOffset + "] @@@@@@")

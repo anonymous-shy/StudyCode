@@ -5,6 +5,7 @@ import kafka.utils.ZkUtils
 import org.I0Itec.zkclient.ZkClient
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.kafka.HasOffsetRanges
+import org.slf4j.{Logger, LoggerFactory}
 
 /**
   *
@@ -14,7 +15,7 @@ import org.apache.spark.streaming.kafka.HasOffsetRanges
   */
 object KafkaOffsetManager {
 
-  lazy val log = org.apache.log4j.LogManager.getLogger("KafkaOffsetManage")
+  lazy val log: Logger = LoggerFactory.getLogger(getClass)
 
   /* 读取zk里面的偏移量，如果有就返回对应的分区和偏移量
    * 如果没有就返回None
@@ -30,10 +31,10 @@ object KafkaOffsetManager {
     offsetsRangesStrOpt match {
       case Some(offsetsRangesStr) =>
         //这个topic在zk里面最新的分区数量
-        val lastest_partitions = ZkUtils.getPartitionsForTopics(zkClient, Seq(topic)).get(topic).get
+        val lastest_partitions = ZkUtils.getPartitionsForTopics(zkClient, Seq(topic))(topic)
         var offsets = offsetsRangesStr.split(",") //按逗号split成数组
           .map(s => s.split(":")) //按冒号拆分每个分区和偏移量
-          .map { case Array(partitionStr, offsetStr) => (TopicAndPartition(topic, partitionStr.toInt) -> offsetStr.toLong) } //加工成最终的格式
+          .map { case Array(partitionStr, offsetStr) => TopicAndPartition(topic, partitionStr.toInt) -> offsetStr.toLong } //加工成最终的格式
           .toMap //返回一个Map
         //说明有分区扩展了
         if (offsets.size < lastest_partitions.size) {
@@ -41,7 +42,7 @@ object KafkaOffsetManager {
           val old_partitions = offsets.keys.map(p => p.partition).toArray
           //通过做差集得出来多的分区数量数组
           val add_partitions = lastest_partitions.diff(old_partitions)
-          if (add_partitions.size > 0) {
+          if (add_partitions.nonEmpty) {
             log.warn("发现kafka新增分区：" + add_partitions.mkString(","))
             add_partitions.foreach(partitionId => {
               offsets += (TopicAndPartition(topic, partitionId) -> 0)
@@ -76,6 +77,8 @@ object KafkaOffsetManager {
 
   class Stopwatch {
     private val start = System.currentTimeMillis()
-    def get(): Long = (System.currentTimeMillis() - start)
+
+    def get(): Long = System.currentTimeMillis() - start
   }
+
 }

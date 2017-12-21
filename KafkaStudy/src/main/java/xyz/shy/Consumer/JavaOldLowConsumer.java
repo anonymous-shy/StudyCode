@@ -18,14 +18,15 @@ import java.util.*;
 
 public class JavaOldLowConsumer {
     public static void main(String args[]) {
-        String[] arg = {"10", "test-topic", "0", "tagtic-slave01", "9092"};
+        String[] arg = {"10", "topic1", "0", "192.168.71.62,192.168.71.63,192.168.71.64", "9092"};
         args = arg;
         JavaOldLowConsumer lowConsumer = new JavaOldLowConsumer();
         long maxReads = Long.parseLong(args[0]);
         String topic = args[1];
         int partition = Integer.parseInt(args[2]);
         List<String> seeds = new ArrayList<>();
-        seeds.add(args[3]);
+        String[] brokers = args[3].split(",");
+        seeds.addAll(Arrays.asList(brokers));
         int port = Integer.parseInt(args[4]);
         try {
             lowConsumer.run(maxReads, topic, partition, seeds, port);
@@ -125,6 +126,7 @@ public class JavaOldLowConsumer {
         }
         if (consumer != null) consumer.close();
     }
+
     // 查找读取起始偏移量
     public static long getLastOffset(SimpleConsumer consumer, String topic, int partition,
                                      long whichTime, String clientName) {

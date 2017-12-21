@@ -11,6 +11,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.streaming.dstream.InputDStream
 import org.apache.spark.streaming.kafka.KafkaUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
+import org.slf4j.{Logger, LoggerFactory}
 //import org.spark_project.jetty.server.{Request, Server}
 //import org.spark_project.jetty.server.handler.{AbstractHandler, ContextHandler}
 
@@ -19,11 +20,9 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
   */
 object SparkDirectStreaming {
 
+  val log: Logger = LoggerFactory.getLogger(getClass)
 
-  val log = org.apache.log4j.LogManager.getLogger("SparkDirectStreaming")
-
-
-  /** *
+  /**
     * 创建StreamingContext
     *
     * @return
@@ -35,7 +34,7 @@ object SparkDirectStreaming {
     val firstReadLastest = true //第一次启动是否从最新的开始消费
 
     val sparkConf = new SparkConf().setAppName("Direct Kafka Offset to Zookeeper")
-    if (isLocal) sparkConf.setMaster("local[1]") //local模式
+    if (isLocal) sparkConf.setMaster("local[*]") //local模式
     sparkConf.set("spark.streaming.stopGracefullyOnShutdown", "true") //优雅的关闭
     sparkConf.set("spark.streaming.backpressure.enabled", "true") //激活削峰功能
     sparkConf.set("spark.streaming.backpressure.initialRate", "5000") //第一次读取的最大数据值
@@ -62,7 +61,7 @@ object SparkDirectStreaming {
 
           //遍历每一个分区里面的消息
           partitions.foreach(msg => {
-            log.info("读取的数据：" + msg)
+            log.info("读取的数据: " + msg)
             //process(msg)  //处理每条数据
           })
         })
@@ -78,11 +77,11 @@ object SparkDirectStreaming {
     * port 对外暴露的端口号
     * ssc Stream上下文
     */
-  /*def daemonHttpServer(port:Int,ssc: StreamingContext)={
-    val server=new Server(port)
-    val context = new ContextHandler();
-    context.setContextPath( "/close" );
-    context.setHandler( new CloseStreamHandler(ssc) )
+  /*def daemonHttpServer(port: Int, ssc: StreamingContext) = {
+    val server = new Server(port)
+    val context = new ContextHandler()
+    context.setContextPath("/close")
+    context.setHandler(new CloseStreamHandler(ssc))
     server.setHandler(context)
     server.start()
   }*/
@@ -143,7 +142,7 @@ object SparkDirectStreaming {
     ssc.start()
     //启动接受停止请求的守护进程
     //daemonHttpServer(5555,ssc)  //方式一通过Http方式优雅的关闭策略
-    //stopByMarkFile(ssc)       //方式二通过扫描HDFS文件来优雅的关闭
+    stopByMarkFile(ssc) //方式二通过扫描HDFS文件来优雅的关闭
     //等待任务终止
     ssc.awaitTermination()
   }
