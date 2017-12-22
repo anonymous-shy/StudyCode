@@ -35,7 +35,7 @@ object ComplexDirect2Zk {
     //    ssc.checkpoint(checkpointDirectory)
     val topicsSet = topics.split(",").toSet
     val kafkaParams = Map[String, String](
-      "metadata.broker.list" -> brokerList,
+      "bootstrap.servers" -> brokerList,
       "group.id" -> group,
       "zookeeper.connect" -> zkQuorums,
       "auto.offset.reset" -> kafka.api.OffsetRequest.SmallestTimeString
@@ -122,7 +122,8 @@ object ComplexDirect2Zk {
       for (offset <- offsetRanges) {
         val zkPath = s"${topicDirs.consumerOffsetDir}/${offset.partition}"
         ZkUtils.updatePersistentPath(zkClient, zkPath, offset.fromOffset.toString)
-        println(s"@@@@@@ topic -> ${offset.topic} || partition -> ${offset.partition} || fromoffset -> ${offset.fromOffset} || untiloffset -> ${offset.untilOffset} @@@@@@")
+        //        println(s"@@@@@@ topic -> ${offset.topic} || partition -> ${offset.partition} || fromoffset -> ${offset.fromOffset} || untiloffset -> ${offset.untilOffset} @@@@@@")
+        println(offset.toString())
       }
       rdd.foreachPartition(
         message => {

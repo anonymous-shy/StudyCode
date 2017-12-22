@@ -199,21 +199,21 @@ class KafkaClusterHelper(val kafkaParams: Map[String, String]) extends Serializa
     }
   }
 
-   //获取kafka最开始的offset
-    def getFromOffsets(kafkaParams: Map[String, String], topics: Set[String]): Map[TopicAndPartition, Long] = {
-      val reset = kafkaParams.get("auto.offset.reset").map(_.toLowerCase)
-      val result = for {
-        topicPartitions <- getPartitions(topics).right
-        leaderOffsets <- (if (reset == Some("smallest")) {
-          getEarliestLeaderOffsets(topicPartitions)
-        } else {
-          getLatestLeaderOffsets(topicPartitions)
-        }).right
-      } yield {
-        leaderOffsets.map { case (tp, lo) =>
-          (tp, lo.offset)
-        }
+  //获取kafka最开始的offset
+  def getFromOffsets(kafkaParams: Map[String, String], topics: Set[String]): Map[TopicAndPartition, Long] = {
+    val reset = kafkaParams.get("auto.offset.reset").map(_.toLowerCase)
+    val result = for {
+      topicPartitions <- getPartitions(topics).right
+      leaderOffsets <- (if (reset == Some("smallest")) {
+        getEarliestLeaderOffsets(topicPartitions)
+      } else {
+        getLatestLeaderOffsets(topicPartitions)
+      }).right
+    } yield {
+      leaderOffsets.map { case (tp, lo) =>
+        (tp, lo.offset)
       }
+    }
     KafkaClusterHelper.checkErrors(result)
   }
 }
@@ -280,6 +280,7 @@ object KafkaClusterHelper {
       new SimpleConsumerConfig(brokers, props)
     }
   }
+
 }
         
 

@@ -1,5 +1,6 @@
 package xyz.shy.spark163.streaming.storeOffsetInZk
 
+import com.typesafe.config.ConfigFactory
 import kafka.api.OffsetRequest
 import kafka.message.MessageAndMetadata
 import kafka.serializer.StringDecoder
@@ -29,10 +30,15 @@ object SparkDirectStreaming {
     */
   def createStreamingContext(): StreamingContext = {
 
+    val resConf = ConfigFactory.load()
+    val topics = resConf.getString("KafkaTopics")
+    val group = resConf.getString("KafkaGroup")
+    val zkQuorums = resConf.getString("com.ZKNodes")
+    val brokerList: String = resConf.getString("com.KafkaBrokers")
+
     val isLocal = true
     //是否使用local模式
     val firstReadLastest = true //第一次启动是否从最新的开始消费
-
     val sparkConf = new SparkConf().setAppName("Direct Kafka Offset to Zookeeper")
     if (isLocal) sparkConf.setMaster("local[*]") //local模式
     sparkConf.set("spark.streaming.stopGracefullyOnShutdown", "true") //优雅的关闭
@@ -40,14 +46,16 @@ object SparkDirectStreaming {
     sparkConf.set("spark.streaming.backpressure.initialRate", "5000") //第一次读取的最大数据值
     sparkConf.set("spark.streaming.kafka.maxRatePerPartition", "2000") //每个进程每秒最多从kafka读取的数据条数
 
-    var kafkaParams = Map[String, String]("bootstrap.servers" -> "192.168.10.6:9092,192.168.10.7:9092,192.168.10.8:9092") //创建一个kafkaParams
-    if (firstReadLastest) kafkaParams += ("auto.offset.reset" -> OffsetRequest.LargestTimeString)
+    var kafkaParams = Map[String, String](//创建一个kafkaParams
+      "bootstrap.servers" -> brokerList
+    )
+    if (firstReadLastest) kafkaParams += ("auto.offset.reset" -> OffsetRequest.SmallestTimeString)
     //从最新的开始消费
     //创建zkClient注意最后一个参数最好是ZKStringSerializer类型的，不然写进去zk里面的偏移量是乱码
-    val zkClient = new ZkClient("192.168.10.6:2181,192.168.10.7:2181,192.168.10.8:2181", 30000, 30000, ZKStringSerializer)
-    val zkOffsetPath = "/sparkstreaming/20171128"
+    val zkClient = new ZkClient(zkQuorums, 30000, 30000, ZKStringSerializer)
+    val zkOffsetPath = s"/sparkstreaming/$topics"
     //zk的路径
-    val topicsSet = "dc_test".split(",").toSet //topic名字
+    val topicsSet = topics.split(",").toSet //topic名字
     val ssc = new StreamingContext(sparkConf, Seconds(10)) //创建StreamingContext,每隔多少秒一个批次
     val rdds: InputDStream[(String, String)] = createKafkaStream(ssc, kafkaParams, zkClient, zkOffsetPath, topicsSet)
     //开始处理数据
@@ -61,7 +69,8 @@ object SparkDirectStreaming {
 
           //遍历每一个分区里面的消息
           partitions.foreach(msg => {
-            log.info("读取的数据: " + msg)
+//            log.info("读取的数据: " + msg)
+            println(s"@^_^@ [" + msg + "] @^_^@")
             //process(msg)  //处理每条数据
           })
         })
@@ -142,7 +151,7 @@ object SparkDirectStreaming {
     ssc.start()
     //启动接受停止请求的守护进程
     //daemonHttpServer(5555,ssc)  //方式一通过Http方式优雅的关闭策略
-    stopByMarkFile(ssc) //方式二通过扫描HDFS文件来优雅的关闭
+    //    stopByMarkFile(ssc) //方式二通过扫描HDFS文件来优雅的关闭
     //等待任务终止
     ssc.awaitTermination()
   }

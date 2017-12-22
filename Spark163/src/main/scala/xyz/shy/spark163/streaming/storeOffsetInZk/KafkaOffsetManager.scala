@@ -70,7 +70,7 @@ object KafkaOffsetManager {
     val offsetsRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
     //转换每个OffsetRange为存储到zk时的字符串格式 :  分区序号1:偏移量1,分区序号2:偏移量2,......
     val offsetsRangesStr = offsetsRanges.map(offsetRange => s"${offsetRange.partition}:${offsetRange.untilOffset}").mkString(",")
-    log.debug(" 保存的偏移量:  " + offsetsRangesStr)
+    log.info("保存的偏移量: " + offsetsRangesStr)
     //将最终的字符串结果保存到zk里面
     ZkUtils.updatePersistentPath(zkClient, zkOffsetPath, offsetsRangesStr)
   }

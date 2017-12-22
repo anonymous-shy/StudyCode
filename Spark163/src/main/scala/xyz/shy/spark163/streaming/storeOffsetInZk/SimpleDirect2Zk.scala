@@ -89,7 +89,8 @@ object SimpleDirect2Zk {
       for (o <- offsetRanges) {
         val zkPath = s"${topicDirs.consumerOffsetDir}/${o.partition}"
         ZkUtils.updatePersistentPath(zkClient, zkPath, o.fromOffset.toString) //将该 partition 的 offset 保存到 zookeeper
-        println(s"@@@@@@ topic -> ${o.topic} || partition -> ${o.partition} || fromoffset -> ${o.fromOffset} || untiloffset -> ${o.untilOffset} @@@@@@")
+//        println(s"@@@@@@ topic -> ${o.topic} || partition -> ${o.partition} || fromoffset -> ${o.fromOffset} || untiloffset -> ${o.untilOffset} @@@@@@")
+        println(o.toString())
       }
       rdd.foreachPartition(
         message => {
