@@ -30,7 +30,7 @@ public class JavaOldProducer {
             String ip = "192.168.1." + rnd.nextInt(255);
             String msg = nEvents + "::" + LocalDateTime.now().toString().substring(0, 19);// + "::" + ip;
             System.out.println(nEvents + " - " + msg);
-            KeyedMessage<String, String> data = new KeyedMessage<>("topic1", Long.toString(nEvents), msg);
+            KeyedMessage<String, String> data = new KeyedMessage<>("topic2", Long.toString(nEvents), msg);
             producer.send(data);
             TimeUnit.SECONDS.sleep(1);
         }

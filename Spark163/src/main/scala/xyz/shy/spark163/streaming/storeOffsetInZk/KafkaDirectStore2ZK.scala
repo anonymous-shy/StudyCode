@@ -1,17 +1,19 @@
 package xyz.shy.spark163.streaming.storeOffsetInZk
 
-import java.util.Arrays
-
 import com.typesafe.config.ConfigFactory
 import kafka.api.{OffsetRequest, PartitionOffsetRequestInfo}
 import kafka.common.{BrokerNotAvailableException, TopicAndPartition}
 import kafka.consumer.SimpleConsumer
+import kafka.message.MessageAndMetadata
+import kafka.serializer.StringDecoder
 import kafka.utils.{Json, ZKGroupTopicDirs, ZKStringSerializer, ZkUtils}
 import org.I0Itec.zkclient.ZkClient
 import org.apache.spark.SparkConf
+import org.apache.spark.streaming.dstream.InputDStream
+import org.apache.spark.streaming.kafka.{HasOffsetRanges, KafkaUtils, OffsetRange}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
+import org.slf4j.{Logger, LoggerFactory}
 
-import scala.collection.immutable
 
 /**
   * Created by Shy on 2017/12/25
@@ -19,19 +21,20 @@ import scala.collection.immutable
 
 object KafkaDirectStore2ZK {
 
+  lazy val log: Logger = LoggerFactory.getLogger(getClass)
+
   def main(args: Array[String]): Unit = {
     val resConf = ConfigFactory.load()
     val confTopic: String = resConf.getString("KafkaTopics")
-    var topics = Seq[String]()
-    confTopic.split(",").foreach(topics += _)
+    var topics = Seq[String](confTopic)
+//    confTopic.split(",").foreach(t => topics += t)
     val group = resConf.getString("KafkaGroup")
     val zkQuorums = resConf.getString("com.ZKNodes")
     val brokerList = resConf.getString("com.KafkaBrokers")
-    val kafkaParams = Map[String, String](
+    var kafkaParams = Map[String, String](
       "metadata.broker.list" -> brokerList,
       "group.id" -> group,
-      "zookeeper.connect" -> zkQuorums,
-      "auto.offset.reset" -> kafka.api.OffsetRequest.SmallestTimeString
+      "zookeeper.connect" -> zkQuorums
     )
     val sparkConf = new SparkConf()
       .setAppName(getClass.getSimpleName)
@@ -85,12 +88,53 @@ object KafkaDirectStore2ZK {
         ZkUtils.makeSurePersistentPathExists(zkClient, zkPath)
         val untilOffset = zkClient.readData[String](zkPath)
         val tp = TopicAndPartition(topic, partition)
+        val offset = try {
+          if (untilOffset == null || untilOffset.trim.equals("")) {
+            kafkaParams += ("auto.offset.reset" -> OffsetRequest.SmallestTimeString)
+            getMinOffset(zkClient, tp)
+          } else
+            untilOffset.toLong
+        } catch {
+          case e: Exception => getMinOffset(zkClient, tp)
+        }
+        fromOffsets += (tp -> offset)
+        log.info(s"@@@@@@ topic[ $topic ] partition[ $partition ] offset[ $offset ] @@@@@@")
       })
     })
+    //这个会将 kafka 的消息进行 transform，最终 kafka 的数据都会变成 (topic_name, message) 这样的 tuple
+    val messageHandler = (mmd: MessageAndMetadata[String, String]) => (mmd.topic, mmd.message())
+    val kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder, (String, String)](ssc, kafkaParams, fromOffsets, messageHandler)
+
+    var offsetRanges = Array[OffsetRange]()
+    kafkaStream.transform { rdd =>
+      offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
+      rdd
+    }.foreachRDD(rdd => {
+      rdd.foreachPartition(message => {
+        while (message.hasNext) {
+          println(s"@^_^@ [" + message.next() + "] @^_^@")
+        }
+      })
+      offsetRanges.foreach(o => {
+        val topicDirs = new ZKGroupTopicDirs(group, o.topic)
+        val zkPath = s"${topicDirs.consumerOffsetDir}/${o.partition}"
+        ZkUtils.updatePersistentPath(zkClient, zkPath, o.untilOffset.toString)
+        log.info(s"@@@@@@ ${o.toString()} @@@@@@")
+        // log.info(s"Offset update: set offset of ${o.topic}/${o.partition} as ${o.untilOffset.toString}")
+      })
+    })
+
+    ssc.start()
+    ssc.awaitTermination()
+  }
+
+  private def createKafkaDStream(): InputDStream[(String, String)] = {
+    var kafkaStream: InputDStream[(String, String)] = null
+    kafkaStream
   }
 
   private def getMinOffset(zkClient: ZkClient, tp: TopicAndPartition): Long = {
-    val request = OffsetRequest(immutable.Map(tp -> PartitionOffsetRequestInfo(OffsetRequest.EarliestTime, 1)))
+    val request = OffsetRequest(Map(tp -> PartitionOffsetRequestInfo(OffsetRequest.EarliestTime, 1)))
 
     ZkUtils.getLeaderForPartition(zkClient, tp.topic, tp.partition) match {
       case Some(brokerId) => {
