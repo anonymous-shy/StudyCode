@@ -1,4 +1,6 @@
-package xyz.shy.spark163.streaming.storeOffsetInZk
+package xyz.shy.spark220.streaming
+
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import com.typesafe.config.ConfigFactory
 import kafka.api.OffsetRequest
@@ -13,8 +15,8 @@ import org.apache.spark.streaming.dstream.InputDStream
 import org.apache.spark.streaming.kafka.KafkaUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.slf4j.{Logger, LoggerFactory}
-//import org.spark_project.jetty.server.{Request, Server}
-//import org.spark_project.jetty.server.handler.{AbstractHandler, ContextHandler}
+import org.spark_project.jetty.server.{Request, Server}
+import org.spark_project.jetty.server.handler.{AbstractHandler, ContextHandler}
 
 /**
   * Created by QinDongLiang on 2017/11/28.
@@ -86,20 +88,20 @@ object SparkDirectStreaming {
     * port 对外暴露的端口号
     * ssc Stream上下文
     */
-  /*def daemonHttpServer(port: Int, ssc: StreamingContext) = {
+  def daemonHttpServer(port: Int, ssc: StreamingContext) = {
     val server = new Server(port)
     val context = new ContextHandler()
     context.setContextPath("/close")
     context.setHandler(new CloseStreamHandler(ssc))
     server.setHandler(context)
     server.start()
-  }*/
+  }
 
   /**
     * 负责接受http请求来优雅的关闭流
     * ssc  Stream上下文
     */
-  /*class CloseStreamHandler(ssc:StreamingContext) extends AbstractHandler {
+  class CloseStreamHandler(ssc:StreamingContext) extends AbstractHandler {
     override def handle(s: String, baseRequest: Request, req: HttpServletRequest, response: HttpServletResponse): Unit ={
       log.warn("开始关闭......")
       ssc.stop(true,true)//优雅的关闭
@@ -110,7 +112,7 @@ object SparkDirectStreaming {
       baseRequest.setHandled(true);
       log.warn("关闭成功.....")
     }
-  }*/
+  }
 
   /** *
     * 通过一个消息文件来定时触发是否需要关闭流程序
