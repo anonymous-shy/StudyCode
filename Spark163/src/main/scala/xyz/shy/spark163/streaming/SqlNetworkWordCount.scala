@@ -19,10 +19,12 @@
 package xyz.shy.spark163.streaming
 
 import com.typesafe.config.ConfigFactory
+import kafka.utils.{ZKGroupTopicDirs, ZkUtils}
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.kafka.{HasOffsetRanges, OffsetRange}
 import org.apache.spark.streaming.{Seconds, StreamingContext, Time}
+import org.slf4j.{Logger, LoggerFactory}
 import xyz.shy.spark163.utils.StreamingUtils
 
 /**
@@ -39,6 +41,8 @@ import xyz.shy.spark163.utils.StreamingUtils
   */
 
 object SqlNetworkWordCount {
+  lazy val log: Logger = LoggerFactory.getLogger(getClass)
+
   def main(args: Array[String]) {
     /*if (args.length < 2) {
       System.err.println("Usage: NetworkWordCount <hostname> <port>")
@@ -85,6 +89,7 @@ object SqlNetworkWordCount {
           sqlContext.sql("select word, count(*) as total from words group by word")
         println(s"========= $time =========")
         wordCountsDataFrame.show()
+        StreamingUtils.saveOffsets(offsetRanges, kafkaParams, zkQuorums)
       })
 
     ssc.start()

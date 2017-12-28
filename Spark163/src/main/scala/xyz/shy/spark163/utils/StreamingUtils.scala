@@ -9,7 +9,7 @@ import kafka.utils.{Json, ZKGroupTopicDirs, ZKStringSerializer, ZkUtils}
 import org.I0Itec.zkclient.ZkClient
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.InputDStream
-import org.apache.spark.streaming.kafka.KafkaUtils
+import org.apache.spark.streaming.kafka.{KafkaUtils, OffsetRange}
 import org.slf4j.{Logger, LoggerFactory}
 
 
@@ -90,6 +90,18 @@ object StreamingUtils {
     val messageHandler = (mmd: MessageAndMetadata[String, String]) => (mmd.topic, mmd.message())
     val kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder, (String, String)](ssc, kafkaParams, fromOffsets, messageHandler)
     kafkaStream
+  }
+
+  def saveOffsets(offsetRanges: Array[OffsetRange], kafkaParams: Map[String, String], zkServers: String): Unit = {
+    val kafkaGroup: String = kafkaParams("group.id")
+    val zkClient = new ZkClient(zkServers, 30000, 30000, ZKStringSerializer)
+    offsetRanges.foreach(o => {
+      val topicDirs = new ZKGroupTopicDirs(kafkaGroup, o.topic)
+      val zkPath = s"${topicDirs.consumerOffsetDir}/${o.partition}"
+      ZkUtils.updatePersistentPath(zkClient, zkPath, o.untilOffset.toString)
+      log.info(s"@@@@@@ ${o.toString()} @@@@@@")
+      // log.info(s"Offset update: set offset of ${o.topic}/${o.partition} as ${o.untilOffset.toString}")
+    })
   }
 
   private def getMinOffset(zkClient: ZkClient, tp: TopicAndPartition): Long = {
