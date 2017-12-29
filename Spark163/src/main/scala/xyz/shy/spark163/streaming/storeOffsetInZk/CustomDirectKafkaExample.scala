@@ -10,6 +10,17 @@ import org.slf4j.LoggerFactory
 
 /**
   * Created by Shy on 2017/12/29
+  *  http://aseigneurin.github.io/
+
+http://aseigneurin.github.io/2016/05/07/spark-kafka-achieving-zero-data-loss.html
+
+http://why-not-learn-something.blogspot.jp/2016/08/upgrading-running-spark-streaming.html
+
+http://www.binwang.me/2015-11-03-the-proper-way-to-use-spark-checkpoint.html
+
+https://github.com/cpbaranwal/Spark-Streaming-DirectKafka-Examples/blob/master/src/main/scala/CustomDirectKafkaExample.scala
+
+https://github.com/ippontech/spark-kafka-source
   */
 
 object CustomDirectKafkaExample {
