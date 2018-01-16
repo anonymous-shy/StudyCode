@@ -21,7 +21,7 @@ object BreakAndContinueDemo extends App {
   var nums = 0
   for (i <- 0 until s.length) {
     breakable {
-      if (s.charAt(i) != "S")
+      if (s(i).equals('S'))
         break
       else nums += 1
     }
