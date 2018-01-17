@@ -18,7 +18,6 @@ public class TraditionalTimerTest {
         }, 5000, 3000);
 
         while (true) {
-            System.out.println(new Date().getSeconds());
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
