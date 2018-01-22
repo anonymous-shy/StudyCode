@@ -23,4 +23,19 @@ object MatchDemo extends App {
     case "stop" | "quit" | "exit" => println("stoping...")
     case _ => println("do nothing...")
   }
+
+  val num = 6
+  val evenOrOdd = num match {
+    case 1 | 3 | 5 | 7 | 9 => println("odd")
+    case 2 | 4 | 6 | 8 | 10 => println("even")
+  }
+
+  println(evenOrOdd)
+
+  def isTrue(a: Any) = a match {
+    case 0 | "" => false
+    case _ => true
+  }
+
+
 }

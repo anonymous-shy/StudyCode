@@ -21,6 +21,7 @@ public class NatureDemo {
 //        new NatureRecognition(parse).recognition(); //词性标注
 //        System.out.println(parse);
         StopRecognition stopRecognition = StopLibrary.get();
+
 //        StopRecognition stopRecognition = new StopRecognition();
 //        stopRecognition.insertStopWords("之所以");
         System.out.println(ToAnalysis.parse("我之所以觉得Ansj中文分词是一个不错的系统!我是also!"));
