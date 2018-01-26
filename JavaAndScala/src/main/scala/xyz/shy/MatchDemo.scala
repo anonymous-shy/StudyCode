@@ -1,6 +1,9 @@
 package xyz.shy
 
+import java.io.{FileNotFoundException, IOException}
+
 import scala.annotation.switch
+import scala.io.Source
 
 /**
   * Created by Shy on 2018/1/11
@@ -36,6 +39,13 @@ object MatchDemo extends App {
     case 0 | "" => false
     case _ => true
   }
+
+  /*def printInfo(x: Any) = x match {
+    case String => println(x)
+    case Int => println(x)
+    case _ => println("XXX")
+  }*/
+
 
 
 }
