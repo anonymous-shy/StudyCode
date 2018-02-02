@@ -20,5 +20,8 @@ public class ThreadTest1 {
                 System.out.println(Thread.currentThread().getName() + " Start...");
             }
         }).start();
+
+        new Thread(() -> System.out.println(Thread.currentThread().getName() + " Start...")) {
+        }.start();
     }
 }
