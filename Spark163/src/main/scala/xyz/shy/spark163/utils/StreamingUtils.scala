@@ -108,9 +108,9 @@ object StreamingUtils {
     val request = OffsetRequest(Map(tp -> PartitionOffsetRequestInfo(OffsetRequest.EarliestTime, 1)))
 
     ZkUtils.getLeaderForPartition(zkClient, tp.topic, tp.partition) match {
-      case Some(brokerId) => {
+      case Some(brokerId) =>
         ZkUtils.readDataMaybeNull(zkClient, ZkUtils.BrokerIdsPath + "/" + brokerId)._1 match {
-          case Some(brokerInfoString) => {
+          case Some(brokerInfoString) =>
             Json.parseFull(brokerInfoString) match {
               case Some(m) =>
                 val brokerInfo = m.asInstanceOf[Map[String, Any]]
@@ -124,11 +124,9 @@ object StreamingUtils {
               case None =>
                 throw new BrokerNotAvailableException("Broker id %d does not exist".format(brokerId))
             }
-          }
           case None =>
             throw new BrokerNotAvailableException("Broker id %d does not exist".format(brokerId))
         }
-      }
       case None =>
         throw new Exception("No broker for partition %s - %s".format(tp.topic, tp.partition))
     }

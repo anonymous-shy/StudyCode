@@ -1,11 +1,14 @@
 package xyz.shy.utils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 /**
  * Created by Shy on 2018/1/29
@@ -26,6 +29,7 @@ public class DateUtils {
      * yyyy-MM-ddTHH:mm:ss
      */
     private static final DateTimeFormatter formatter_DateTimeT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    private static final DateTimeFormatter formatter_DateTimeTZ = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     /**
      * @return 获取当前日期
@@ -85,6 +89,13 @@ public class DateUtils {
     }
 
     /**
+     * @return 返回当前系统时间 返回当前系统时间 yyyy-MM-dd HH:mm:ss
+     */
+    public static String getDateTimeTZ() {
+        return getLocalDateTime().format(formatter_DateTimeTZ);
+    }
+
+    /**
      * @return 获取当月第一天 yyyy-MM-dd
      */
     public static String getFirstDayOfMonth() {
@@ -140,6 +151,16 @@ public class DateUtils {
     }
 
     /**
+     * 将yyyyMMddHHmmss转为 LocalDateTime
+     *
+     * @param dateTimestamp yyyyMMddHHmmss
+     * @return LocalDateTime LocalDateTime
+     */
+    public static LocalDateTime parseLocalDateTimestampTZ(String dateTimestamp) {
+        return LocalDateTime.parse(dateTimestamp, formatter_DateTimeTZ);
+    }
+
+    /**
      * yyyy-MM-dd字符串转LocalDate
      *
      * @param dateString yyyy-MM-dd
@@ -180,14 +201,46 @@ public class DateUtils {
         return 0;
     }
 
+    /**
+     * 将String字符串转换为java.sql.Timestamp格式日期,用于数据库保存
+     *
+     * @param strDate    表示日期的字符串
+     * @param dateFormat 传入字符串的日期表示格式（如："yyyy-MM-dd HH:mm:ss"）
+     * @return java.sql.Timestamp类型日期对象（如果转换失败则返回null）
+     */
+    public static java.sql.Timestamp strToSqlDate(String strDate, String dateFormat) {
+        SimpleDateFormat sf = new SimpleDateFormat(dateFormat);
+        java.util.Date date = null;
+        try {
+            date = sf.parse(strDate);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        java.sql.Timestamp dateSQL = new java.sql.Timestamp(date.getTime());
+        return dateSQL;
+    }
+
+    public static Date strTojuDate(String strDate, String dateFormat) {
+        SimpleDateFormat sf = new SimpleDateFormat(dateFormat);
+        Date date = null;
+        try {
+            date = sf.parse(strDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
+
     //TEST//
     public static void main(String[] args) {
-        System.out.println(getLocalDateTime());
-        System.out.println(getClockMillis());
-        System.out.println(getDateTimestamp());
-        System.out.println(getDateTime());
-        System.out.println(getDateTimeT());
-        System.out.println(getFirstDayOfMonth());
-        System.out.println(getLastDayOfMonth());
+//        System.out.println(getLocalDateTime());
+//        System.out.println(getClockMillis());
+//        System.out.println(getDateTimestamp());
+//        System.out.println(getDateTime());
+//        System.out.println(getDateTimeT());
+//        System.out.println(getFirstDayOfMonth());
+//        System.out.println(getLastDayOfMonth());
+        System.out.println(parseLocalDateTimestampTZ("2016-02-03T02:40:06.930Z"));
+        System.out.println(strToSqlDate("2016-02-03T02:40:06.930Z", "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
     }
 }

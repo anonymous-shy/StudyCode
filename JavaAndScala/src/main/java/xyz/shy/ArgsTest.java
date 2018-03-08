@@ -9,7 +9,7 @@ import org.apache.commons.cli.*;
 public class ArgsTest {
 
     public static void main(String[] args) {
-        String[] arg = {"-h", "-c", "config.xml"};
+        String[] arg = {"-c", "config.xml"};
         testOptions(arg);
     }
 
