@@ -24,7 +24,7 @@ object ReduceByKeyAndWindowDemo {
       .map((_, 1))
       .reduceByKeyAndWindow((i1: Int, i2: Int) => i1 + i2, Seconds(30), Seconds(10))
       .transform(word => {
-        val hotwords = word.map(x => (x._2, x._1)).sortByKey(false).map(x => (x._2, x._1))
+        val hotwords = word.map(x => (x._2, x._1)).sortByKey(ascending = false).map(x => (x._2, x._1))
         hotwords.take(3).foreach(print)
         word
       })
