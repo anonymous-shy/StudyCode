@@ -24,8 +24,7 @@ object StreamingUtils {
                               kafkaParams: Map[String, String],
                               zkServers: String,
                               topics: Seq[String]): InputDStream[(String, String)] = {
-    var kps: Map[String, String] = kafkaParams
-    val kafkaGroup: String = kps("group.id")
+    val kafkaGroup: String = kafkaParams("group.id")
     //创建zkClient注意最后一个参数最好是ZKStringSerializer类型的，不然写进去zk里面的偏移量是乱码
     val zkClient = new ZkClient(zkServers, 30000, 30000, ZKStringSerializer)
     val partitions4Topics = ZkUtils.getPartitionsForTopics(zkClient, topics)
@@ -73,14 +72,17 @@ object StreamingUtils {
         ZkUtils.makeSurePersistentPathExists(zkClient, zkPath)
         val untilOffset = zkClient.readData[String](zkPath)
         val tp = TopicAndPartition(topic, partition)
+        // 获取 kafkaParams 中 auto.offset.reset,若不存在则默认从最新消费.
+        val reset = kafkaParams.getOrElse("auto.offset.reset", OffsetRequest.LargestTimeString).trim.toLowerCase
         val offset = try {
           if (untilOffset == null || untilOffset.trim.equals("")) {
-            kps += ("auto.offset.reset" -> OffsetRequest.SmallestTimeString)
-            getMinOffset(zkClient, tp)
+            getResetOffset(zkClient, tp, reset)
           } else
             untilOffset.toLong
         } catch {
-          case e: Exception => getMinOffset(zkClient, tp)
+          case e: Exception =>
+            getResetOffset(zkClient, tp, reset)
+            log.error(e.getMessage)
         }
         fromOffsets += (tp -> offset)
         log.info(s"@@@@@@ topic[ $topic ] partition[ $partition ] offset[ $offset ] @@@@@@")
@@ -104,8 +106,23 @@ object StreamingUtils {
     })
   }
 
-  private def getMinOffset(zkClient: ZkClient, tp: TopicAndPartition): Long = {
-    val request = OffsetRequest(Map(tp -> PartitionOffsetRequestInfo(OffsetRequest.EarliestTime, 1)))
+  private def getResetOffset(zkClient: ZkClient, tp: TopicAndPartition, reset: String): Long = {
+    /**
+      * kafka.api.OffsetRequest
+      * case class PartitionOffsetRequestInfo(time: Long, maxNumOffsets: Int)
+      * val SmallestTimeString = "smallest"
+      * val LargestTimeString = "largest"
+      * val LatestTime = -1L
+      * val EarliestTime = -2L
+      * 第二个参数maxNumOffsets : 具体意思不明!
+      * 但是测试后发现传入 1 时返回 offset.reset 对应的offset,传入 2 返回一个包含最大和最小offset的元组
+      */
+    // val request = OffsetRequest(Map(tp -> PartitionOffsetRequestInfo(OffsetRequest.EarliestTime, 1)))
+    val request = reset match {
+      case OffsetRequest.SmallestTimeString => OffsetRequest(Map(tp -> PartitionOffsetRequestInfo(OffsetRequest.EarliestTime, 1)))
+      case OffsetRequest.LargestTimeString => OffsetRequest(Map(tp -> PartitionOffsetRequestInfo(OffsetRequest.LatestTime, 1)))
+      case _ => OffsetRequest(Map(tp -> PartitionOffsetRequestInfo(OffsetRequest.LatestTime, 1)))
+    }
 
     ZkUtils.getLeaderForPartition(zkClient, tp.topic, tp.partition) match {
       case Some(brokerId) =>
@@ -116,7 +133,7 @@ object StreamingUtils {
                 val brokerInfo = m.asInstanceOf[Map[String, Any]]
                 val host = brokerInfo("host").asInstanceOf[String]
                 val port = brokerInfo("port").asInstanceOf[Int]
-                new SimpleConsumer(host, port, 10000, 100000, "getMinOffset")
+                new SimpleConsumer(host, port, 10000, 100000, "getResetOffset")
                   .getOffsetsBefore(request)
                   .partitionErrorAndOffsets(tp)
                   .offsets
