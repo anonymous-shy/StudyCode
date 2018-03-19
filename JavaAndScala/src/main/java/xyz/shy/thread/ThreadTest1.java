@@ -1,4 +1,4 @@
-package xyz.shy;
+package xyz.shy.thread;
 
 /**
  * Created by Shy on 2018/1/24

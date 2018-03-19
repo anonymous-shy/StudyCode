@@ -1,4 +1,4 @@
-package xyz.shy;
+package xyz.shy.thread;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
