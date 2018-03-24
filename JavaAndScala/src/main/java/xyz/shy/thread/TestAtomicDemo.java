@@ -1,5 +1,7 @@
 package xyz.shy.thread;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Created by Shy on 2018/3/16
  */
@@ -16,10 +18,18 @@ public class TestAtomicDemo {
 
 class AtomicDemo implements Runnable {
 
-    private int serialNumber = 0;
+//    private int serialNumber = 0;
+
+    private AtomicInteger serialNumber = new AtomicInteger();
 
     public int getSerialNumber() {
-        return serialNumber++;
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+//        return serialNumber++;
+        return serialNumber.getAndIncrement();
     }
 
     @Override
