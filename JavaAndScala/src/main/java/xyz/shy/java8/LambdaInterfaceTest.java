@@ -30,6 +30,7 @@ public class LambdaInterfaceTest {
         return function.apply(str);
     }
 
+    // Predicate<T> 断言型接口
     public List<String> Predicate(List<String> list, Predicate<String> predicate) {
         List<String> strList = new ArrayList<>();
         for (String s : list) {
@@ -45,7 +46,7 @@ public class LambdaInterfaceTest {
         List<Integer> list = SupplierDemo(10, () -> new Random().nextInt(100));
         for (Integer num : list)
             System.out.println(num);
-        System.out.println(FunctionDemo("AnonYmous", (s) -> s.toUpperCase()));
+        System.out.println(FunctionDemo("AnonYmous", String::toUpperCase));
         List<String> asList = Arrays.asList("Shy", "Emma", "Taylor", "Dilraba");
         List<String> predicateList = Predicate(asList, s -> s.length() > 3);
         for (String s : predicateList)
