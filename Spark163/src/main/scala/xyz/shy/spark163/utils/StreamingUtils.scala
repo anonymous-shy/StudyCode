@@ -74,15 +74,15 @@ object StreamingUtils {
         val tp = TopicAndPartition(topic, partition)
         // 获取 kafkaParams 中 auto.offset.reset,若不存在则默认从最新消费.
         val reset = kafkaParams.getOrElse("auto.offset.reset", OffsetRequest.LargestTimeString).trim.toLowerCase
-        val offset = try {
+        val offset: Long = try {
           if (untilOffset == null || untilOffset.trim.equals("")) {
             getResetOffset(zkClient, tp, reset)
           } else
             untilOffset.toLong
         } catch {
           case e: Exception =>
-            getResetOffset(zkClient, tp, reset)
             log.error(e.getMessage)
+            getResetOffset(zkClient, tp, reset)
         }
         fromOffsets += (tp -> offset)
         log.info(s"@@@@@@ topic[ $topic ] partition[ $partition ] offset[ $offset ] @@@@@@")
