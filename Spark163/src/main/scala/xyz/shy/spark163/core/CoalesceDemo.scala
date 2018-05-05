@@ -28,7 +28,7 @@ object CoalesceDemo extends App {
       println(s"Index: $index, $i")
     iter
   }).coalesce(3)
-  println("RePartition Size: " + coalesce.partitions.size)
+  println("RePartition Size: " + coalesce.partitions.length)
 
   coalesce.mapPartitionsWithIndex((index, iter) => {
     for (i <- iter)

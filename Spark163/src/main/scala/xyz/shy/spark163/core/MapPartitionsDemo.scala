@@ -39,7 +39,7 @@ object MapPartitionsDemo extends App {
     //    res.iterator
   })
   partitionsRdd.collect.foreach(println)
-  println(s"Paration个数: " + partitionsRdd.partitions.size)
+  println(s"Paration个数: " + partitionsRdd.partitions.length)
 }
 
 object MapPartitionsOper extends App {
