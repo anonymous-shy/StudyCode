@@ -10,8 +10,8 @@ import scalikejdbc._
 object ScalikejdbcDemo4 extends App {
 
   // DBs.setup/DBs.setupAll loads specified JDBC driver classes.
-  DBs.setupAll()
-  // DBs.setup()
+  //  DBs.setupAll()
+  DBs.setup()
   // DBs.setup('legacy)
   // // Unlike DBs.setupAll(), DBs.setup() doesn't load configurations under global settings automatically
   // DBs.loadGlobalSettings()

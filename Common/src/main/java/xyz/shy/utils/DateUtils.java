@@ -240,7 +240,9 @@ public class DateUtils {
 //        System.out.println(getDateTimeT());
 //        System.out.println(getFirstDayOfMonth());
 //        System.out.println(getLastDayOfMonth());
-        System.out.println(parseLocalDateTimestampTZ("2016-02-03T02:40:06.930Z"));
-        System.out.println(strToSqlDate("2016-02-03T02:40:06.930Z", "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+//        System.out.println(parseLocalDateTimestampTZ("2016-02-03T02:40:06.930Z"));
+//        System.out.println(strToSqlDate("2016-02-03T02:40:06.930Z", "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+
+        System.out.println(getLocalDate().toString().replace("-", "").substring(0, 6));
     }
 }
