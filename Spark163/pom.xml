@@ -28,7 +28,8 @@
         <dependency>
             <groupId>com.redislabs</groupId>
             <artifactId>spark-redis</artifactId>
-            <version>0.5.1</version>
+            <!--<version>0.5.1</version>-->
+            <version>0.3.2</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
         <dependency>
