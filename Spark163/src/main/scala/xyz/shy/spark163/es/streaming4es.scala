@@ -1,12 +1,9 @@
 package xyz.shy.spark163.es
 
-import java.time.LocalDate
-
 import com.typesafe.config.ConfigFactory
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming.kafka.{HasOffsetRanges, OffsetRange}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
-import org.elasticsearch.spark.streaming.EsSparkStreaming
 import org.elasticsearch.spark.rdd.EsSpark
 import xyz.shy.spark163.streaming.StreamingExamples
 import xyz.shy.spark163.utils.StreamingUtils
@@ -15,7 +12,7 @@ import xyz.shy.spark163.utils.StreamingUtils
   * Created by Shy on 2018/5/25
   */
 
-object KafkaNews2Es {
+object streaming4es {
 
   def main(args: Array[String]): Unit = {
     val resConf = ConfigFactory.load()
@@ -50,16 +47,12 @@ object KafkaNews2Es {
       rdd
     }.map(_._2)
       .foreachRDD(rdd => {
-        //        EsSparkStreaming.saveJsonToEs(rdd, "game_lib_news/_doc")
-        //        EsSpark.esJsonRDD(rdd, "game_lib_news/_doc", esCfg)
-
+        // 同RDD
         EsSpark.saveJsonToEs(rdd, "game_lib_news/_doc", esCfg)
 
         StreamingUtils.saveOffsets(offsetRanges, kafkaParams, zkQuorums)
       })
     //    EsSparkStreaming.saveJsonToEs(ds, "game_lib_news/_doc", esCfg)
-    //    StreamingUtils.saveOffsets(offsetRanges, kafkaParams, zkQuorums)
-
     ssc.start()
     ssc.awaitTermination()
   }
