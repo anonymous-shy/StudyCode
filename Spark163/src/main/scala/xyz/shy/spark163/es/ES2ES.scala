@@ -1,4 +1,4 @@
-package xyz.shy.spark163.kafka2es
+package xyz.shy.spark163.es
 
 import com.typesafe.config.ConfigFactory
 import org.apache.spark.sql.SQLContext
@@ -43,6 +43,5 @@ object ES2ES {
     val newsRdd = sc.esRDD("game_lib_news")
     newsRdd.cache()
     println(newsRdd.count())
-    newsRdd.foreach(println)
   }
 }

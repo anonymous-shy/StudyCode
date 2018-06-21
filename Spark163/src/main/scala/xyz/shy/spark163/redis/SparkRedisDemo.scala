@@ -19,7 +19,7 @@ object SparkRedisDemo extends App {
     // initial redis port
     .set("redis.port", "7002")
   val sc = new SparkContext(conf)
-  private val list: RDD[String] = sc.parallelize(Seq("Shy", "Emma", "Taylor", "ReAct", "Dolores", "AnonYmous"))
+  private val list: RDD[String] = sc.parallelize(Seq("Shy", "ReAct", "Dolores", "AnonYmous"))
   /* spark-redis-0.5.1
   val keysRDD = sc.fromRedisKeyPattern(("tagtic-slave01", 7000), "user", 2)
   private val hashRdd: RDD[(String, String)] = keysRDD.getHash()

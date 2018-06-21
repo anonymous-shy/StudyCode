@@ -1,4 +1,4 @@
-package xyz.shy.spark163.kafka2es
+package xyz.shy.spark163.es
 
 import java.time.LocalDate
 
