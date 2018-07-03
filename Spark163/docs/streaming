@@ -1,0 +1,32 @@
+Spark Streaming
+集群节点上总共拥有的CPU core :
+首先,一定要大于Spark Streaming App 的Receiver数量,因为一个Receiver独占一个CPU core.
+其次,在spark-submit中,给App分配的CPU core的数量,肯定是 <= 集群的CPU core的数量,但是必须 > App中Receiver数量.
+
+在集群中运行的Spark Streaming App中的executor是一个长时间运行的任务,因此它会独占分配给App的CPU core.
+并且每个executor分配的core,必须 > 1.
+这样才能保证分配到executor上运行的DStream两条线程并行,一条运行Receiver,接收数据.一条处理数据.
+
+Kafka数据源
+1.基于Receiver方式:
+    Receiver是使用Kafka High level Consumer API实现的.
+    Receiver从kafka中获取数据都存在Spark Executor的内存中,然后Streaming启动job去处理数据.
+    然而,在默认配置下,这种方式会因为底层的失败而导致丢失数据,
+    如果启用高可用机制,让数据零丢失,就必须开启streaming的预写日志机制(Write Ahead Log WAL).
+    该机制会同步地将接收到的kafka数据写入分布式文件系统(比如hdfs)上的预写日志中.
+    所以,即使底层节点出现了失败,也可以使用预写日志中的数据进行恢复.
+2.基于Direct方式: 可以确保数据不丢失更加健壮的机制
+    周期性的查询kafka,来获取每个topic+partition的最新的offset,从而定义每个batch的offset的范围.
+    当处理数据的job启动时,就会使用kafka Low level Consumer API来获取kafka指定offset范围的数据.
+    优点:
+    1.简化并行读取：如果要读取多个partition，不需要创建多个输入DStream然后对他们进行union操作。
+      Spark会创建跟kafka partition一样多的RDD partition，并且会并行从kafka中读取数据。
+      所以在kafka partition和RDD partition之间，有一对一的映射关系。
+    2.高效率：要保证数据的零丢失，不需要开启WAL机制，只要kafka中做了数据的副本就够了。
+    3.消费一次且仅一次的事务机制：****
+      基于Receiver的方式，是使用kafka High level Consumer API在zk中保存消费过的offset的。
+      这是消费kafka数据的传统方式。这种方式配合着WAL机制可以保证数据零丢失的高可靠性。
+      但是，却无法保证数据被处理一次且仅一次，可能会处理两次，以为spark和zk之间可能不同步。
+      基于Direct的方式，使用kafka Low level Consumer API，streaming自己就负责追踪消费的offset，
+      并保存在checkpoint中。streaming自己一定是同步的，因此会保证数据是消费一次且仅一次。
+

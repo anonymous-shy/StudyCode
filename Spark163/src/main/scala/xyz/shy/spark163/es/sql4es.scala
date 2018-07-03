@@ -53,6 +53,6 @@ object sql4es {
     //|-- arrival: string (nullable = true)
     //|-- days: long (nullable = true)
 
-    df.saveToEs("sql_bank", esCfg)
+    df.saveToEs("sql_bank/_doc", esCfg)
   }
 }
