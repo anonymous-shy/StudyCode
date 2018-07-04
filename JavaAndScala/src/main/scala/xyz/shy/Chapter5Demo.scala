@@ -39,7 +39,7 @@ class Person5 {
   override def toString = s"${super.toString} > ${getClass.getSimpleName} > name = $name"
 }
 
-class Star {
+class Star5 {
   private var name: String = _
   private var age: Int = 0
 
@@ -81,7 +81,7 @@ object Chapter5Demo extends App {
   println(s"name: ${p.getName}, age: ${p.getAge}")
   println(p.toString)
 
-  val s1 = new Star
-  val s2 = new Star("A")
-  val s3 = new Star("A", 1)
+  val s1 = new Star5
+  val s2 = new Star5("A")
+  val s3 = new Star5("A", 1)
 }

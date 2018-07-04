@@ -1,5 +1,7 @@
 package xyz.shy
 
+import scala.collection.mutable.ArrayBuffer
+
 /**
   * Created by Shy on 2017/9/9.
   */
@@ -25,4 +27,9 @@ object StrDemo extends App {
   val age = 1
   println(s"My name is $name")
   println(s"Age is ${age + 1}")
+
+  val ab = ArrayBuffer[String]()
+  ab += "SHY"
+  ab.append("EMMA")
+  println(ab)
 }

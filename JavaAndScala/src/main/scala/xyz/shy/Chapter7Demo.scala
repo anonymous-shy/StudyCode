@@ -9,7 +9,7 @@ import scala.beans.BeanProperty
   * 要测试某个对象是否属于某个类,可以用 isInstanceOf 方法
   */
 
-class Employee extends Person {
+class Employee extends Person5 {
   @BeanProperty var eid: Int = _
 
   override def toString: String = super.toString + " > " + eid
