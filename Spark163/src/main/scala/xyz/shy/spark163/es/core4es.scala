@@ -22,7 +22,7 @@ object core4es {
       "es.port" -> "9200",
       "es.mapping.id" -> "firstname",
       "es.read.field.include" -> "account_number,balance,firstname,",
-      //      "es.read.field.exclude" -> "lastname,address",
+      // "es.read.field.exclude" -> "lastname,address",
       "es.scroll.size" -> "1000"
       // "es.input.max.docs.per.partition" -> "100000"
       // "es.input.use.sliced.partitions" -> "true" ? shard partitions
@@ -53,10 +53,10 @@ object core4es {
     val readRdd: RDD[(String, Map[String, AnyRef])] = EsSpark.esRDD(sc, "bank", query, esCfg)
     readRdd.take(10).foreach(println)
     val valueRdd = readRdd.map(_._2)
-    EsSpark.saveToEs(valueRdd, "test_bank/_doc", esCfg)
+//    EsSpark.saveToEs(valueRdd, "test_bank/_doc", esCfg)
     println("=====================")
     val readJsonRdd: RDD[String] = EsSpark.esJsonRDD(sc, "bank", query, esCfg).map(_._2)
     readJsonRdd.take(10).foreach(println)
-    EsSpark.saveJsonToEs(readJsonRdd, "json_bank/_doc", esCfg)
+//    EsSpark.saveJsonToEs(readJsonRdd, "json_bank/_doc", esCfg)
   }
 }

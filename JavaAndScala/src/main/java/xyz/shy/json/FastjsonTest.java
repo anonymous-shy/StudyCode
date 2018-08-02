@@ -34,4 +34,6 @@ public class FastjsonTest {
         Object parse = JSON.toJSON(goods);
         System.out.println(parse);
     }
+
+
 }

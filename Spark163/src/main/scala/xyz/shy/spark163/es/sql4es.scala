@@ -38,9 +38,10 @@ object sql4es {
       "es.nodes" -> "tagtic-slave01,tagtic-slave02,tagtic-slave03",
       "es.port" -> "9200",
       "es.mapping.id" -> "firstname",
-      "es.read.field.include" -> "account_number,balance,firstname,",
+      "es.read.field.include" -> "account_number,balance,firstname",
       // "es.read.field.exclude" -> "lastname,address",
       "es.scroll.size" -> "1000",
+      "pushdown" -> "true",
       "es.query" -> query
     )
     //    val bankDF = sqlContext.esDF("bank", query, esCfg)
@@ -53,6 +54,6 @@ object sql4es {
     //|-- arrival: string (nullable = true)
     //|-- days: long (nullable = true)
 
-    df.saveToEs("sql_bank/_doc", esCfg)
+//    df.saveToEs("sql_bank/_doc", esCfg)
   }
 }

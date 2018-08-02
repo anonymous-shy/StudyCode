@@ -71,7 +71,7 @@ public class JavaOldHighConsumer {
     }
 
     public static void main(String[] args) {
-        String[] arg = {"tagtic-master:2181", "group-shy", "test-topic", "3"};
+        String[] arg = {"tagtic-master:2181", "group-shy", "topic3", "2"};
         args = arg;
         String zooKeeper = args[0];
         String groupId = args[1];

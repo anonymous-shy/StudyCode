@@ -33,7 +33,7 @@ public class JavaOldProducer {
             int i = rnd.nextInt(stars.length - 1);
             String word = stars[i] + "::" + logos[i] + "::" + guitars[i];
             System.out.println(nEvents + " <-> " + word);
-            KeyedMessage<String, String> data = new KeyedMessage<>("topic3", Long.toString(nEvents), word);
+            KeyedMessage<String, String> data = new KeyedMessage<>("request_new", Long.toString(nEvents), word);
             producer.send(data);
             TimeUnit.SECONDS.sleep(1);
         }

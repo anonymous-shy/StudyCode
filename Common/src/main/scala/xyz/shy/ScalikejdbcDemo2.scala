@@ -20,6 +20,12 @@ object ScalikejdbcDemo2 extends App {
   Class.forName("com.mysql.jdbc.Driver")
   ConnectionPool.singleton(url, user, password, settings)
 
+  val deptno = "30"
+  implicit val session = AutoSession
+  val entities: List[Map[String, Any]] = sql"SELECT * FROM test.EMP WHERE DEPTNO = $deptno".map(_.toMap).list.apply()
+  println(entities)
+  println("*" * 100)
+
   val empno = 7788
 
   // simple example
