@@ -21,15 +21,24 @@ object sql4es {
     val query =
       """
         |{
+        |  "size": 1,
         |  "query": {
-        |    "constant_score": {
-        |      "filter": {
-        |        "range": {
-        |          "balance": {
-        |            "gte": 40000
+        |    "bool": {
+        |      "must": [
+        |        {
+        |          "terms": {
+        |"newsmode": [1, -1, 5, 6, 7, 8, 10, 91,2, 3, 92, 93]
+        |}
+        |        },{
+        |          "term": {
+        |            "coverthumbnailimglists.keyword": ""
+        |          }
+        |        },{
+        |          "term": {
+        |            "imgcount": "0"
         |          }
         |        }
-        |      }
+        |      ]
         |    }
         |  }
         |}
