@@ -4,6 +4,7 @@ import scalikejdbc._
 
 /**
   * Created by Shy on 2017/12/29
+  * https://www.iteblog.com/archives/1602.html#API-2
   */
 
 object ScalikejdbcDemo1 {

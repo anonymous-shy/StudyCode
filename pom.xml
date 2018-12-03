@@ -16,6 +16,7 @@
         <module>ChineseSegment</module>
         <module>Spark220</module>
         <module>JavaAndScala</module>
+        <module>Flink</module>
     </modules>
 
 
