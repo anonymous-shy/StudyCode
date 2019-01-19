@@ -1,3 +1,4 @@
+/*
 package xyz.shy.Consumer;
 
 import kafka.api.FetchRequest;
@@ -12,9 +13,11 @@ import kafka.message.MessageAndOffset;
 import java.nio.ByteBuffer;
 import java.util.*;
 
+*/
 /**
  * Created by Shy on 2017/11/28
- */
+ *//*
+
 
 public class JavaOldLowConsumer {
     public static void main(String args[]) {
@@ -42,14 +45,16 @@ public class JavaOldLowConsumer {
         m_replicaBrokers = new ArrayList<>();
     }
 
-    /**
+    */
+/**
      * @param a_maxReads    消息的最大数量阅读（所以我们没有永远循环下去）
      * @param a_topic       从Topic（主题）读取
      * @param a_partition   从Partition（分区）读取
      * @param a_seedBrokers 一个broker用于Metadata的查询
      * @param a_port        Broker端口监听
      * @throws Exception
-     */
+     *//*
+
     public void run(long a_maxReads, String a_topic, int a_partition, List<String> a_seedBrokers, int a_port) throws Exception {
         // find the meta data about the topic and partition we are interested in
         // 1. 从所有活跃的broker中找出哪个是指定Topic（主题） Partition（分区）中的leader broker
@@ -210,3 +215,4 @@ public class JavaOldLowConsumer {
     }
 }
 
+*/

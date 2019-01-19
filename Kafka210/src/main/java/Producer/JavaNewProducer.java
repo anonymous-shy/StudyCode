@@ -1,10 +1,9 @@
-package xyz.shy.Producer;
+package Producer;
 
 import org.apache.kafka.clients.producer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalDateTime;
 import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
@@ -42,7 +41,7 @@ public class JavaNewProducer {
     private static Properties createProperties() {
         Properties properties = new Properties();
 //        properties.put("bootstrap.servers", "192.168.1.101:9092,192.168.1.102:9092,192.168.1.103:9092");
-        properties.put("bootstrap.servers", "192.168.71.62:9092,192.168.71.63:9092,192.168.71.64:9092");
+        properties.put("bootstrap.servers", "192.168.71.62:19092,192.168.71.63:19092,192.168.71.64:19092");
         properties.put("acks", "all");
         properties.put("retries", 0); // 消息发送请求失败重试次数
         properties.put("batch.size", 2000);
@@ -58,10 +57,10 @@ public class JavaNewProducer {
     private static void sendMessage() {
         Properties properties = createProperties();
         Producer<String, String> producer = new KafkaProducer<>(properties);
-        int i;
+        int i, j;
         Random rnd = new Random();
 //        String[] stars = {"Shy", "Dilraba", "Emma", "Taylor", "Gulnazar", "AnonYmous"};
-        String[] search_word = {"Gibson", "Fender", "MusicMan", "ESP", "Nike", "Air Jordan", "PRS", "Adidas", "puma"};
+        String[] search_word = {"Gibson", "Fender", "MusicMan", "ESP", "Nike", "AirJordan", "PRS", "Adidas", "Puma"};
         String[] words = {"Hadoop", "Yarn", "MapReduce",
                 "Spark", "SparkCore", "SparkSQL", "SparkStreaming", "SparkML",
                 "Spring", "Kafka", "Mybatis", "Java", "Scala", "Python", "HBase"};
@@ -70,27 +69,25 @@ public class JavaNewProducer {
                 TimeUnit.SECONDS.sleep(1);
                 String ip = "192.168.1." + rnd.nextInt(255);
                 i = rnd.nextInt(search_word.length - 1);
-                String word = search_word[i] + "::" + words[i];
+                j = rnd.nextInt(words.length - 1);
+                String word = search_word[i] + "::" + words[j];
 //                String msg = LocalDateTime.now().toString() + ",www.shy.xyz," + ip;
 //                String msg = ip + "::" + LocalDateTime.now().toString() + "::" + words[i];
                 String msg = ip + "::" + word;
                 System.out.println(msg);
                 String key = Integer.toString(i);
 //                String value = "times: [" + key + "]" + LocalDateTime.now().toString();
-                ProducerRecord<String, String> record = new ProducerRecord<>("TextLinesTopic", key, msg);
+                ProducerRecord<String, String> record = new ProducerRecord<>("T1", key, msg);
                 producer.send(record, new Callback() {
-                    @Override
                     public void onCompletion(RecordMetadata metadata, Exception e) {
                         if (e != null) {
-                            System.out.println("metadata信息 >>>>  " + metadata);
                             e.printStackTrace();
-                            System.out.println("发生异常： the offset of the send record is {}" + metadata.offset());
-                            logger.warn("send record error {}", e);
+                        } else {
+//                            System.out.println("The offset of the record we just sent is: " + metadata.offset());
+                            System.out.println("partition: -> " + metadata.partition() + ", offset: -> " + metadata.offset());
                         }
-                        logger.info("offset: {}, partition: {}", metadata.offset(), metadata.partition());
                     }
-                }).get();
-                i++;
+                });
             }
         } catch (Exception e) {
             logger.warn("{}", e);
