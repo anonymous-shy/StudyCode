@@ -17,7 +17,7 @@
         <module>Spark220</module>
         <module>JavaAndScala</module>
         <module>Flink</module>
-        <module>KafkaNew</module>
+        <module>KafkaStudy</module>
         <module>Kafka210</module>
     </modules>
 

@@ -1,4 +1,4 @@
-package xyz.shy
+package xyz.shy.batch
 
 import org.apache.flink.api.scala.ExecutionEnvironment
 
