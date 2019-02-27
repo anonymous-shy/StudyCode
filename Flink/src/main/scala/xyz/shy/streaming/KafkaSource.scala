@@ -38,7 +38,7 @@ object KafkaSource {
     prop.setProperty("group.id", "shy-flink")
     prop.setProperty("auto.offset.reset", "earliest") // DEFAULT: latest
 
-    val flinkConsumer = new FlinkKafkaConsumer[String]("T1", new SimpleStringSchema(), prop)
+    val flinkConsumer: FlinkKafkaConsumer[String] = new FlinkKafkaConsumer[String]("T1", new SimpleStringSchema(), prop)
     /**
       * Specifies the consumer to start reading from any committed group offsets found
       * in Zookeeper / Kafka brokers. The "group.id" property must be set in the configuration
