@@ -1,3 +1,4 @@
+/*
 package xyz.shy.spark163.redis
 
 import com.redislabs.provider.redis._
@@ -33,3 +34,4 @@ object SparkRedisDemo extends App {
   private val kvRdd: RDD[(String, String)] = listRdd.map((_, 1.toString))
   sc.toRedisHASH(kvRdd, "bar")
 }
+*/
