@@ -4,6 +4,7 @@ import org.apache.kafka.clients.producer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
 import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
@@ -40,7 +41,7 @@ public class JavaNewProducer {
 
     private static Properties createProperties() {
         Properties properties = new Properties();
-//        properties.put("bootstrap.servers", "192.168.1.101:9092,192.168.1.102:9092,192.168.1.103:9092");
+//        properties.put("bootstrap.servers", "192.168.71.62:9092,192.168.71.63:9092,192.168.71.64:9092");
         properties.put("bootstrap.servers", "192.168.71.62:19092,192.168.71.63:19092,192.168.71.64:19092");
         properties.put("acks", "all");
         properties.put("retries", 0); // 消息发送请求失败重试次数
@@ -59,7 +60,6 @@ public class JavaNewProducer {
         Producer<String, String> producer = new KafkaProducer<>(properties);
         int i, j;
         Random rnd = new Random();
-//        String[] stars = {"Shy", "Dilraba", "Emma", "Taylor", "Gulnazar", "AnonYmous"};
         String[] search_word = {"Gibson", "Fender", "MusicMan", "ESP", "Nike", "AirJordan", "PRS", "Adidas", "Puma"};
         String[] words = {"Hadoop", "Yarn", "MapReduce",
                 "Spark", "SparkCore", "SparkSQL", "SparkStreaming", "SparkML",
@@ -71,19 +71,15 @@ public class JavaNewProducer {
                 i = rnd.nextInt(search_word.length - 1);
                 j = rnd.nextInt(words.length - 1);
                 String word = search_word[i] + "::" + words[j];
-//                String msg = LocalDateTime.now().toString() + ",www.shy.xyz," + ip;
-//                String msg = ip + "::" + LocalDateTime.now().toString() + "::" + words[i];
-                String msg = ip + "::" + word;
+                String msg = LocalDateTime.now().toString() + "::" + ip + "::" + word;
                 System.out.println(msg);
                 String key = Integer.toString(i);
-//                String value = "times: [" + key + "]" + LocalDateTime.now().toString();
                 ProducerRecord<String, String> record = new ProducerRecord<>("T1", key, msg);
                 producer.send(record, new Callback() {
                     public void onCompletion(RecordMetadata metadata, Exception e) {
                         if (e != null) {
                             e.printStackTrace();
                         } else {
-//                            System.out.println("The offset of the record we just sent is: " + metadata.offset());
                             System.out.println("partition: -> " + metadata.partition() + ", offset: -> " + metadata.offset());
                         }
                     }

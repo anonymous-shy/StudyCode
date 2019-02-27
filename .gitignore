@@ -27,3 +27,17 @@ hs_err_pid*
 *.iml
 target/
 .settings/
+ChineseSegment/src/test/
+Common/src/main/java/xyz/shy/guava/
+Common/src/test/
+ESStudy/src/main/resources/
+ESStudy/src/test/
+Flink/src/test/
+JavaAndScala/src/main/resources/
+JavaAndScala/src/test/java/
+Kafka210/docs/
+Kafka210/src/main/resources/
+Kafka210/src/main/scala/
+Kafka210/src/test/
+Spark163/src/main/scala/xyz/shy/spark163/exercise/sql/
+Spark220/src/main/java/

@@ -10,7 +10,6 @@ import breeze.numerics._
 object BreezeDemo {
 
   def main(args: Array[String]): Unit = {
-
     // 1. Breeze 创建向量Vector，矩阵Matrix
     val m1 = DenseMatrix.zeros[Double](2, 3)
     val v1 = DenseVector.zeros[Double](3)
