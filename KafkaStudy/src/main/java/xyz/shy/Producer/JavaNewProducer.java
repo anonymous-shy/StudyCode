@@ -58,26 +58,21 @@ public class JavaNewProducer {
     private static void sendMessage() {
         Properties properties = createProperties();
         Producer<String, String> producer = new KafkaProducer<>(properties);
-        int i;
+        int i = 0;
         Random rnd = new Random();
-//        String[] stars = {"Shy", "Dilraba", "Emma", "Taylor", "Gulnazar", "AnonYmous"};
-        String[] search_word = {"Gibson", "Fender", "MusicMan", "ESP", "Nike", "Air Jordan", "PRS", "Adidas", "puma"};
-        String[] words = {"Hadoop", "Yarn", "MapReduce",
+        String[] words = {"Hadoop", "Yarn", "MapReduce", "HBase", "Kafka",
                 "Spark", "SparkCore", "SparkSQL", "SparkStreaming", "SparkML",
-                "Spring", "Kafka", "Mybatis", "Java", "Scala", "Python", "HBase"};
+                "Spring", "Mybatis", "Java", "Scala", "Python",
+                "Gibson", "Fender", "MusicMan", "ESP", "PRS",
+                "Adidas", "Puma", "Nike", "Air Jordan", "AnonoYmous"};
         try {
             while (true) {
                 TimeUnit.SECONDS.sleep(1);
-                String ip = "192.168.1." + rnd.nextInt(255);
-                i = rnd.nextInt(search_word.length - 1);
-                String word = search_word[i] + "::" + words[i];
-//                String msg = LocalDateTime.now().toString() + ",www.shy.xyz," + ip;
-//                String msg = ip + "::" + LocalDateTime.now().toString() + "::" + words[i];
-                String msg = ip + "::" + word;
+                String word = words[rnd.nextInt(words.length - 1)];
+                String msg = i + "::" + word + "::" + LocalDateTime.now().toString();
                 System.out.println(msg);
                 String key = Integer.toString(i);
-//                String value = "times: [" + key + "]" + LocalDateTime.now().toString();
-                ProducerRecord<String, String> record = new ProducerRecord<>("TextLinesTopic", key, msg);
+                ProducerRecord<String, String> record = new ProducerRecord<>("DMT_1", key, msg);
                 producer.send(record, new Callback() {
                     @Override
                     public void onCompletion(RecordMetadata metadata, Exception e) {

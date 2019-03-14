@@ -29,11 +29,11 @@
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka -->
-        <dependency>
+        <!--<dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka_2.11</artifactId>
             <version>0.8.2.2</version>
-        </dependency>
+        </dependency>-->
     </dependencies>
 
     <build>
