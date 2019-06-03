@@ -22,7 +22,7 @@
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch-spark-13_2.11</artifactId>
-            <version>6.2.4</version>
+            <version>6.4.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/RedisLabs/spark-redis -->
         <dependency>

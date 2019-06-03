@@ -1,5 +1,6 @@
 package xyz.shy.spark163.core
 
+import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
@@ -11,8 +12,8 @@ object UnionDemo extends App {
     .setAppName("UnionDemo")
     .setMaster("local")
   val sc = new SparkContext(conf)
-  val rdd1 = sc.makeRDD(Range(1, 10))
-  val rdd2 = sc.makeRDD(Range(5, 15))
+  val rdd1: RDD[Int] = sc.makeRDD(Range(1, 10))
+  val rdd2: RDD[Int] = sc.makeRDD(Range(5, 15))
   //union 将两个RDD进行合并,不去重.
   rdd1.union(rdd2).foreach(println(_))
   println("~~~~~~~~~~~~~~Union~~~~~~~~~~~~~~~~~~")
