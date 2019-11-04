@@ -19,7 +19,6 @@
         <module>Flink</module>
         <module>KafkaStudy</module>
         <module>Kafka210</module>
-        <module>TestJar</module>
     </modules>
 
 
