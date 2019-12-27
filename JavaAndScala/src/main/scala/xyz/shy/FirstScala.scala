@@ -22,7 +22,7 @@ object FirstScala {
     println("Hello World")
   }
 
-  def extractWords(contenttext: String): String = {
+  /*def extractWords(contenttext: String): String = {
     val httpClient = HttpClients.createDefault
     val inner_interface = "http://10.44.153.64/process/getResults"
     val outer_interface = "http://101.200.185.42/process/getResults"
@@ -44,7 +44,7 @@ object FirstScala {
       response.close()
       httpClient.close()
     }
-  }
+  }*/
   def main(args: Array[String]) {
 
     //    println(add(1, 2))

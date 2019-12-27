@@ -25,12 +25,12 @@
             <version>6.4.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/RedisLabs/spark-redis -->
-        <dependency>
+        <!--<dependency>
             <groupId>com.redislabs</groupId>
             <artifactId>spark-redis</artifactId>
-            <!--<version>0.5.1</version>-->
+            &lt;!&ndash;<version>0.5.1</version>&ndash;&gt;
             <version>0.3.2</version>
-        </dependency>
+        </dependency>-->
         <!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
         <dependency>
             <groupId>redis.clients</groupId>
