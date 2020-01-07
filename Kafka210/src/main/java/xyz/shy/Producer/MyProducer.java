@@ -1,4 +1,4 @@
-package Producer;
+package xyz.shy.Producer;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -11,7 +11,7 @@ public class MyProducer {
 	public static void main(String[] args) {
 
 		// 1. 创建kafka生产者的配置信息
-		Properties properties = new Properties();  
+		Properties properties = new Properties();
 		// Kafka 集群
 		properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.71.62:19092,192.168.71.63:19092,192.168.71.64:19092");
 		// ACK应答级别
