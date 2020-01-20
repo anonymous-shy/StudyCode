@@ -32,7 +32,7 @@ public class JedisClusterPoolUtils {
         nodes.add(new HostAndPort("192.168.71.63", 7002));
         nodes.add(new HostAndPort("192.168.71.63", 7003));
         nodes.add(new HostAndPort("192.168.71.64", 7004));
-        nodes.add(new HostAndPort("192.168.71.65", 7005));
+        nodes.add(new HostAndPort("192.168.71.64", 7005));
 
         // 只有当jedisCluster为空时才实例化
         if (jedisCluster == null) {
