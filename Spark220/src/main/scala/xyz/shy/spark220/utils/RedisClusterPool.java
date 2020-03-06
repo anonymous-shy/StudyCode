@@ -55,6 +55,17 @@ public class RedisClusterPool {
 
     }
 
+    public static void returnConnection(JedisCluster jedisCluster) {
+        if (jedisCluster != null) {
+            /*
+             * 两个方法效果不一样。
+             * returnObject 不关闭进程
+             * close关闭！！！
+             */
+            objectPool.returnObject(jedisCluster);
+        }
+    }
+
     public static void closeJedisCluster(JedisCluster jedisCluster) {
         if (jedisCluster != null) {
             /*
@@ -67,9 +78,9 @@ public class RedisClusterPool {
         }
     }
 
-
     /**
      * Test ...
+     *
      * @param args ...
      */
     public static void main(String[] args) {

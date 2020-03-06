@@ -38,12 +38,12 @@ public class RedisClusterPoolFactory implements PooledObjectFactory<JedisCluster
         // Could not get a resource from the pool
         poolConfig.setMaxWaitMillis(1000);
         Set<HostAndPort> nodes = new LinkedHashSet<HostAndPort>();
-        nodes.add(new HostAndPort("192.168.71.62", 7000));
-        nodes.add(new HostAndPort("192.168.71.62", 7001));
-        nodes.add(new HostAndPort("192.168.71.63", 7002));
-        nodes.add(new HostAndPort("192.168.71.63", 7003));
-        nodes.add(new HostAndPort("192.168.71.64", 7004));
-        nodes.add(new HostAndPort("192.168.71.65", 7005));
+        nodes.add(new HostAndPort("172.24.119.42", 7000));
+        nodes.add(new HostAndPort("172.24.119.36", 7000));
+        nodes.add(new HostAndPort("172.24.119.31", 7000));
+        nodes.add(new HostAndPort("172.24.119.35", 7000));
+        nodes.add(new HostAndPort("172.24.119.33", 7000));
+//        nodes.add(new HostAndPort("192.168.71.64", 7005));
         JedisCluster JedisCluster = new JedisCluster(nodes, poolConfig);
         return new DefaultPooledObject<JedisCluster>(JedisCluster);
     }

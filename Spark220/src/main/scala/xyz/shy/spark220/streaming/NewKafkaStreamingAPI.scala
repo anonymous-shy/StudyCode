@@ -2,7 +2,7 @@ package xyz.shy.spark220.streaming
 
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.common.serialization.StringDeserializer
-import org.apache.spark.SparkConf
+import org.apache.spark.{SparkConf, TaskContext}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.streaming.kafka010._
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
@@ -20,7 +20,7 @@ object NewKafkaStreamingAPI {
       "bootstrap.servers" -> "localhost:9092,anotherhost:9092",
       "key.deserializer" -> classOf[StringDeserializer],
       "value.deserializer" -> classOf[StringDeserializer],
-      "group.id" -> "use_a_separate_group_id_for_each_stream",
+      "group.id" -> "GROUP_Shy",
       "auto.offset.reset" -> "latest",
       "enable.auto.commit" -> (false: java.lang.Boolean)
     )
@@ -34,7 +34,18 @@ object NewKafkaStreamingAPI {
       PreferConsistent,
       Subscribe[String, String](topics, kafkaParams)
     )
+    //    stream.map(record => (record.key, record.value))
 
-    stream.map(record => (record.key, record.value))
+    stream.foreachRDD { (rdd, time) =>
+      if (!rdd.isEmpty()) {
+        val offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
+        rdd.foreachPartition { iter =>
+          val o: OffsetRange = offsetRanges(TaskContext.get.partitionId)
+          println(s"${o.topic} ${o.partition} ${o.fromOffset} ${o.untilOffset}")
+          iter.foreach(record => println(record.toString))
+          println(s"========> ${time} <========")
+        }
+      }
+    }
   }
 }

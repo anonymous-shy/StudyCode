@@ -60,6 +60,7 @@ object StreamingUtils {
       partitions.foreach(partition => {
         //获取 zookeeper 中的路径，这里会变成 /consumers/$group/offsets/$topic  <=> /consumers/group-shy/offsets/topic1
         val zkPath = s"${topicDirs.consumerOffsetDir}/$partition"
+
         /**
           * make sure a persistent path exists in ZK. Create the path if not exist.
           * 若为第一次则创建zkPath
@@ -90,7 +91,9 @@ object StreamingUtils {
     })
     //这个会将 kafka 的消息进行 transform，最终 kafka 的数据都会变成 (topic_name, message) 这样的 tuple
     val messageHandler = (mmd: MessageAndMetadata[String, String]) => (mmd.topic, mmd.message())
-    val kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder, (String, String)](ssc, kafkaParams, fromOffsets, messageHandler)
+    val kafkaStream = KafkaUtils.createDirectStream[String, String,
+      StringDecoder, StringDecoder,
+      (String, String)](ssc, kafkaParams, fromOffsets, messageHandler)
     kafkaStream
   }
 
