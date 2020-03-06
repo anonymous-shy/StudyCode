@@ -13,6 +13,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <hadoop.version>2.7.7</hadoop.version>
         <hbase.version>1.2.0</hbase.version>
         <spark.version>2.4.4</spark.version>

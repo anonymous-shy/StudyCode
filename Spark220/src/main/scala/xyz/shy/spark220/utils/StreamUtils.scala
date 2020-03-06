@@ -3,13 +3,11 @@ package xyz.shy.spark220.utils
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.common.serialization.StringDeserializer
-import org.apache.spark.{SparkConf, TaskContext}
+import org.apache.log4j.Logger
 import org.apache.spark.streaming.dstream.InputDStream
 import org.apache.spark.streaming.kafka010.{ConsumerStrategies, HasOffsetRanges, KafkaUtils, LocationStrategies}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
-import java.{util => ju}
-
-import org.apache.log4j.Logger
+import org.apache.spark.{SparkConf, TaskContext}
 
 object StreamUtils {
   lazy private val LOG: Logger = Logger.getLogger(this.getClass)
@@ -19,6 +17,10 @@ object StreamUtils {
   val BOOTSTRAP: String = resConf.getString("com.KafkaBrokers")
   val TOPICS: String = resConf.getString("com.KafkaTopics")
   val zkQuorums: String = resConf.getString("com.ZKNodes")
+
+  def main(args: Array[String]): Unit = {
+
+  }
 
   /**
     * KafkaUtils.createDirectStream
@@ -47,16 +49,16 @@ object StreamUtils {
   /**
     * 获取 kafka Direct Stream
     *
-    * @param ssc            StreamingContext
-    * @param topicAndOffset Map[TopicPartition, Long]
+    * @param ssc    StreamingContext
+    * @param topics Set(topics)
     * @return
     */
-  def getKafkaDirect(ssc: StreamingContext, topics: Set[String], topicAndOffset: ju.List[String]): InputDStream[ConsumerRecord[String, String]] = {
+  def getKafkaDirect(ssc: StreamingContext, topics: Set[String]): InputDStream[ConsumerRecord[String, String]] = {
     val kafkaParams = getKafkaParams
     var kafkaStreams: InputDStream[ConsumerRecord[String, String]] = null
-    if (topicAndOffset.size() > 0) {
-      //读取redis的offset消费 Map[TopicPartition, Long]
-      val topicAndPartition = KafkaOffsetManage.getTopicPartitionOffset(GROUP_ID, TOPICS.split(",").toSet)
+    //读取redis的offset消费 Map[TopicPartition, Long]
+    val topicAndPartition = KafkaOffsetManage.getTopicPartitionOffset(GROUP_ID, TOPICS.split(",").toSet)
+    if (topicAndPartition.nonEmpty) {
       kafkaStreams = KafkaUtils.createDirectStream[String, String](
         ssc,
         LocationStrategies.PreferConsistent,
