@@ -10,10 +10,7 @@ object KafkaZKUtils {
   lazy private val LOG: Logger = Logger.getLogger(this.getClass)
 
   val resConf: Config = ConfigFactory.load()
-  val GROUP_ID: String = resConf.getString("com.KafkaGroup")
-  val BOOTSTRAP: String = resConf.getString("com.KafkaBrokers")
-  val TOPICS: String = resConf.getString("com.KafkaTopics")
-  val zkQuorums: String = resConf.getString("com.ZKNodes")
+  val zkQuorums: String = resConf.getString("com.zkNodes")
 
   /**
     * 返回示例:

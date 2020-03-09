@@ -1,5 +1,7 @@
 package xyz.shy.spark220.utils;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.PooledObjectFactory;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
@@ -12,6 +14,10 @@ import java.util.Set;
 
 
 public class RedisClusterPoolFactory implements PooledObjectFactory<JedisCluster> {
+    static {
+        Config config = ConfigFactory.load();
+    }
+
     /**
      * 什么时候会调用此方法
      * 1：从资源池中获取资源的时候
@@ -38,11 +44,12 @@ public class RedisClusterPoolFactory implements PooledObjectFactory<JedisCluster
         // Could not get a resource from the pool
         poolConfig.setMaxWaitMillis(1000);
         Set<HostAndPort> nodes = new LinkedHashSet<HostAndPort>();
-        nodes.add(new HostAndPort("172.24.119.42", 7000));
-        nodes.add(new HostAndPort("172.24.119.36", 7000));
-        nodes.add(new HostAndPort("172.24.119.31", 7000));
-        nodes.add(new HostAndPort("172.24.119.35", 7000));
-        nodes.add(new HostAndPort("172.24.119.33", 7000));
+        nodes.add(new HostAndPort("192.168.71.62", 7000));
+        nodes.add(new HostAndPort("192.168.71.62", 7001));
+        nodes.add(new HostAndPort("192.168.71.63", 7002));
+        nodes.add(new HostAndPort("192.168.71.63", 7003));
+        nodes.add(new HostAndPort("192.168.71.64", 7004));
+        nodes.add(new HostAndPort("192.168.71.64", 7005));
 //        nodes.add(new HostAndPort("192.168.71.64", 7005));
         JedisCluster JedisCluster = new JedisCluster(nodes, poolConfig);
         return new DefaultPooledObject<JedisCluster>(JedisCluster);

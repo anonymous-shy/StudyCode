@@ -13,13 +13,20 @@ object StreamUtils {
   lazy private val LOG: Logger = Logger.getLogger(this.getClass)
 
   val resConf: Config = ConfigFactory.load()
-  val GROUP_ID: String = resConf.getString("com.KafkaGroup")
-  val BOOTSTRAP: String = resConf.getString("com.KafkaBrokers")
-  val TOPICS: String = resConf.getString("com.KafkaTopics")
-  val zkQuorums: String = resConf.getString("com.ZKNodes")
+  val GROUP_ID: String = resConf.getString("com.kafkaGroup")
+  val BOOTSTRAP: String = resConf.getString("com.kafkaBrokers")
+  val TOPICS: String = resConf.getString("com.kafkaTopics")
+  val zkQuorums: String = resConf.getString("com.zkNodes")
+  val batchDurationMs: String = resConf.getString("com.batchDurationMs")
+  val checkpointDir: String = resConf.getString("com.checkpointDir")
 
   def main(args: Array[String]): Unit = {
 
+    val ssc = getSparkStreaming("Test New Streaming", batchDurationMs.toInt, checkpointDir)
+    val kafkaStream = getKafkaDirectStream(ssc, TOPICS)
+    service(kafkaStream)
+    ssc.start()
+    ssc.awaitTermination()
   }
 
   /**
@@ -34,15 +41,17 @@ object StreamUtils {
         val offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
         rdd.foreachPartition(partition => {
           val o = offsetRanges(TaskContext.get.partitionId)
-          println(s"${o.topic} ${o.partition} ${o.fromOffset} ${o.untilOffset}")
-          // service coding
+          println(s"@@@@@@ ${o.toString} @@@@@@")
           partition.foreach { record =>
-            LOG.info(record.key() + ":" + record.value())
+            // service coding
+            val key: String = record.key()
+            val value: String = record.value()
+            println(key + " -> " + value)
           }
         })
-        println(s"========> $time <========")
         KafkaOffsetManage.setTopicPartitionOffset(GROUP_ID, offsetRanges)
       }
+      println(s"========> $time <========")
     })
   }
 
@@ -53,23 +62,24 @@ object StreamUtils {
     * @param topics Set(topics)
     * @return
     */
-  def getKafkaDirect(ssc: StreamingContext, topics: Set[String]): InputDStream[ConsumerRecord[String, String]] = {
+  def getKafkaDirectStream(ssc: StreamingContext, topics: String): InputDStream[ConsumerRecord[String, String]] = {
     val kafkaParams = getKafkaParams
     var kafkaStreams: InputDStream[ConsumerRecord[String, String]] = null
+    val topicSet = topics.split(",").toSet
     //读取redis的offset消费 Map[TopicPartition, Long]
-    val topicAndPartition = KafkaOffsetManage.getTopicPartitionOffset(GROUP_ID, TOPICS.split(",").toSet)
+    val topicAndPartition = KafkaOffsetManage.getTopicPartitionOffset(GROUP_ID, topicSet)
     if (topicAndPartition.nonEmpty) {
       kafkaStreams = KafkaUtils.createDirectStream[String, String](
         ssc,
         LocationStrategies.PreferConsistent,
-        ConsumerStrategies.Subscribe[String, String](topics, kafkaParams, topicAndPartition)
+        ConsumerStrategies.Subscribe[String, String](topicSet, kafkaParams, topicAndPartition)
       )
     } else {
       //从零消费
       kafkaStreams = KafkaUtils.createDirectStream[String, String](
         ssc,
         LocationStrategies.PreferConsistent,
-        ConsumerStrategies.Subscribe[String, String](topics, kafkaParams)
+        ConsumerStrategies.Subscribe[String, String](topicSet, kafkaParams)
       )
     }
     kafkaStreams
@@ -89,11 +99,15 @@ object StreamUtils {
       .set("spark.streaming.stopGracefullyOnShutdown", "true")
       .set("spark.streaming.kafka.maxRatePerPartition", "2000")
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+    sparkConf.setMaster("local[*]")
 
     //创建sparkStreaming 并返回 根据check目录检查是否创建streamingContext，有的话从check中恢复
-    val ssc = StreamingContext.getActiveOrCreate(checkpointDirectory,
-      () => new StreamingContext(sparkConf, Seconds(batchDuration)))
-    ssc.checkpoint(checkpointDirectory)
+    // TODO
+    //    val ssc = StreamingContext.getActiveOrCreate(checkpointDirectory,
+    //      () => new StreamingContext(sparkConf, Seconds(batchDuration)))
+    //    ssc.checkpoint(checkpointDirectory)
+    // TEST
+    val ssc = new StreamingContext(sparkConf, Seconds(batchDuration))
     ssc
   }
 

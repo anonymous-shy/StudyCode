@@ -19,5 +19,9 @@ object Test extends App {
     time)
 
   val partitions4Topics: Map[String, Seq[Int]] = kafkaZkClient.getPartitionsForTopics(Set("T1", "T2"))
-  print(partitions4Topics.toString)
+  println(partitions4Topics.toString)
+
+  val t1 = "T1"
+  val s1 = t1.split(",").toSet
+  println(s1)
 }
