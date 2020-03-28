@@ -25,7 +25,11 @@
             <version>3.0.0</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>0.1.7</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.xyz.shy.spark220.core/jackson-databind -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

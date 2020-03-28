@@ -33,12 +33,12 @@ object KafkaSource {
 
     val prop = new Properties()
     prop.setProperty("bootstrap.servers", "192.168.71.62:19092,192.168.71.63:19092,192.168.71.64:19092")
-//    prop.setProperty("bootstrap.servers", "192.168.71.64:9092")
-//    prop.setProperty("group.id", "shy-flink")
-    prop.setProperty("group.id", "shy-flink")
-    prop.setProperty("auto.offset.reset", "earliest") // DEFAULT: latest
+    //    prop.setProperty("bootstrap.servers", "192.168.71.64:9092")
+    prop.setProperty("group.id", "Flink-Shy")
+    prop.setProperty("auto.offset.reset", "latest") // DEFAULT: latest
 
     val flinkConsumer: FlinkKafkaConsumer[String] = new FlinkKafkaConsumer[String]("T1", new SimpleStringSchema(), prop)
+
     /**
       * Specifies the consumer to start reading from any committed group offsets found
       * in Zookeeper / Kafka brokers. The "group.id" property must be set in the configuration
@@ -53,8 +53,14 @@ object KafkaSource {
       */
     flinkConsumer.setStartFromGroupOffsets()
     val record = env.addSource(flinkConsumer)
-    record.print()
+    record.map(data => {
+      val ss = data.split("::")
+      LOG(ss(0), ss(1), ss(2), ss(3))
+    }).keyBy(_.ip).print()
 
     env.execute(getClass.getSimpleName)
   }
 }
+
+// 2020-03-10T16:21:57.067::192.168.1.58::Gibson::Scala
+case class LOG(ts: String, ip: String, G: String, C: String)

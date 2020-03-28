@@ -23,7 +23,7 @@ public class JavaNewProducer {
 
     public static void main(String[] args) {
         ExecutorService threadPool = Executors.newFixedThreadPool(10);
-//        threadPool.execute(new GenTopicProducer("T1"));
+        threadPool.execute(new GenTopicProducer("T1"));
         threadPool.execute(new GenTopicProducer("T2"));
     }
 }

@@ -2,11 +2,13 @@ package xyz.shy.streaming
 
 import java.util.Properties
 
+import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.streaming.api.CheckpointingMode
 import org.apache.flink.streaming.api.environment.CheckpointConfig
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer
-import org.apache.flink.api.common.serialization.SimpleStringSchema
+import org.apache.flink.streaming.connectors.kafka.internals.KeyedSerializationSchemaWrapper
+import org.apache.flink.streaming.connectors.kafka.{FlinkKafkaProducer, KafkaSerializationSchema}
+import org.apache.flink.streaming.util.serialization.KeyedSerializationSchema
 
 /**
   * Created by Shy on 2019/2/18
@@ -33,10 +35,18 @@ object KafkaSink {
     val prop = new Properties()
     //    prop.setProperty("bootstrap.servers", "192.168.71.62:19092,192.168.71.63:19092,192.168.71.64:19092")
     prop.setProperty("bootstrap.servers", "192.168.71.62:9092,192.168.71.63:9092,192.168.71.64:9092")
+    // TODO : 泛型传递？
+    val newflinkProducer = new FlinkKafkaProducer[String]("FlinkSinkTopic",
+      new KeyedSerializationSchemaWrapper[String](new SimpleStringSchema),
+      prop,
+      FlinkKafkaProducer.Semantic.EXACTLY_ONCE)
+
     val flinkProducer = new FlinkKafkaProducer[String]("FlinkSinkTopic", new SimpleStringSchema(), prop)
 
+    flinkProducer.setWriteTimestampToKafka(true)
     text.addSink(flinkProducer)
 
     env.execute(getClass.getSimpleName)
   }
 }
+
