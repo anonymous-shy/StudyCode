@@ -43,7 +43,7 @@ object NewKafkaStreamingAPI {
           val o: OffsetRange = offsetRanges(TaskContext.get.partitionId)
           println(s"${o.topic} ${o.partition} ${o.fromOffset} ${o.untilOffset}")
           iter.foreach(record => println(record.toString))
-          println(s"========> ${time} <========")
+          println(s"========> $time <========")
         }
       }
     }

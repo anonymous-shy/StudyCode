@@ -37,7 +37,7 @@ object KafkaSource {
     prop.setProperty("group.id", "Flink-Shy")
     prop.setProperty("auto.offset.reset", "latest") // DEFAULT: latest
 
-    val flinkConsumer: FlinkKafkaConsumer[String] = new FlinkKafkaConsumer[String]("T1", new SimpleStringSchema(), prop)
+    val flinkConsumer: FlinkKafkaConsumer[String] = new FlinkKafkaConsumer[String]("log-1", new SimpleStringSchema(), prop)
 
     /**
       * Specifies the consumer to start reading from any committed group offsets found

@@ -87,6 +87,7 @@ public class RedisClusterPool {
         JedisCluster jedisCluster = RedisClusterPool.getJedisCluster();
         String foo = jedisCluster.get("foo");
         System.out.println(foo);
-        RedisClusterPool.closeJedisCluster(jedisCluster);
+        RedisClusterPool.returnConnection(jedisCluster);
+//        RedisClusterPool.closeJedisCluster(jedisCluster);
     }
 }
